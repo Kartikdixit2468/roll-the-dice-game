@@ -7,27 +7,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       /* ==========================================
-           USER'S 3D DICE CSS WITH SLIGHT POSITION TWEAKS
+           CLEAN 3D DICE CSS (Cream & Forest Green)
            ========================================== */
       .dice-container-wrapper {
-        position: absolute;
-        top: 290px; /* Positioned right between graph and the below container */
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
         display: flex;
+        justify-content: center;
         gap: 20px;
         pointer-events: auto; /* Let clicks register on the dice */
         cursor: pointer;
-        z-index: 20;
         perspective: 800px;
-        transition:
-          transform 0.2s ease-in-out,
-          opacity 0.5s;
+        transition: transform 0.2s ease-in-out;
       }
 
       /* Hover effect locked strictly to rotation from center */
       .dice-container-wrapper:hover {
-        transform: translateX(-50%) rotate(8deg);
+        transform: rotate(8deg) scale(1.05);
       }
 
       .dice {
@@ -45,18 +40,18 @@
         height: 12px;
         margin: -6px 0 0 -6px;
         border-radius: 50%;
-        background-color: #f25f5c;
-        box-shadow: inset 2px 2px #d90429;
+        background-color: #064e3b; /* Dark forest green */
+        box-shadow: inset 2px 2px #022c22;
       }
 
       .side {
         position: absolute;
-        background-color: #fff;
+        background-color: #fdfbf5; /* Cream/off-white */
         border-radius: 5px;
         width: 60px;
         height: 60px;
-        border: 1px solid #e5e5e5;
-        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #d6d3d1;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
       }
 
       /* 3D Box Construction */
@@ -147,16 +142,13 @@
            GAME UI CSS
            ========================================== */
       body {
-        background-color: #70c1b3;
+        background-color: #ecfdf5; /* Very soft emerald/mint */
         font-family:
           system-ui,
           -apple-system,
           sans-serif;
-        overflow: hidden;
-      }
-
-      .bar-container {
-        transition: height 0.5s ease-out;
+        overflow-x: hidden;
+        color: #334155;
       }
 
       .shake {
@@ -180,159 +172,158 @@
     </style>
   </head>
   <body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Main Game Container (Clean White Card) -->
     <div
-      class="max-w-4xl w-full bg-white/90 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden relative border-4 border-white/50"
+      class="max-w-5xl w-full bg-white rounded-2xl shadow-xl overflow-hidden relative border border-slate-200"
     >
       <!-- Header -->
       <div
-        class="bg-teal-600 text-white p-4 flex justify-between items-center shadow-md"
+        class="bg-emerald-600 text-white p-4 flex justify-between items-center shadow-md z-10 relative"
       >
         <h1 class="text-2xl font-bold flex items-center gap-2">
-          <span class="text-3xl">📊</span> Dice Graph Master
+          Dice Graph Master
         </h1>
-        <div class="text-lg font-medium bg-teal-800/40 px-4 py-1.5 rounded-md">
-          Rolls: <span id="roll-counter" class="font-bold">0 / 100</span>
-        </div>
       </div>
 
       <div class="p-6 relative">
-        <!-- 3D Dice Overlay (Removed tailwind hover classes to prevent position jumping) -->
-        <div
-          id="dice-overlay"
-          onclick="handleRoll(1)"
-          class="dice-container-wrapper drop-shadow-2xl opacity-100"
-          title="Click to roll 1x"
-        >
-          <div id="dice1" class="dice show-1">
-            <div class="side one"><div class="dot one-1"></div></div>
-            <div class="side two">
-              <div class="dot two-1"></div>
-              <div class="dot two-2"></div>
-            </div>
-            <div class="side three">
-              <div class="dot three-1"></div>
-              <div class="dot three-2"></div>
-              <div class="dot three-3"></div>
-            </div>
-            <div class="side four">
-              <div class="dot four-1"></div>
-              <div class="dot four-2"></div>
-              <div class="dot four-3"></div>
-              <div class="dot four-4"></div>
-            </div>
-            <div class="side five">
-              <div class="dot five-1"></div>
-              <div class="dot five-2"></div>
-              <div class="dot five-3"></div>
-              <div class="dot five-4"></div>
-              <div class="dot five-5"></div>
-            </div>
-            <div class="side six">
-              <div class="dot six-1"></div>
-              <div class="dot six-2"></div>
-              <div class="dot six-3"></div>
-              <div class="dot six-4"></div>
-              <div class="dot six-5"></div>
-              <div class="dot six-6"></div>
-            </div>
-          </div>
-          <div id="dice2" class="dice show-1">
-            <div class="side one"><div class="dot one-1"></div></div>
-            <div class="side two">
-              <div class="dot two-1"></div>
-              <div class="dot two-2"></div>
-            </div>
-            <div class="side three">
-              <div class="dot three-1"></div>
-              <div class="dot three-2"></div>
-              <div class="dot three-3"></div>
-            </div>
-            <div class="side four">
-              <div class="dot four-1"></div>
-              <div class="dot four-2"></div>
-              <div class="dot four-3"></div>
-              <div class="dot four-4"></div>
-            </div>
-            <div class="side five">
-              <div class="dot five-1"></div>
-              <div class="dot five-2"></div>
-              <div class="dot five-3"></div>
-              <div class="dot five-4"></div>
-              <div class="dot five-5"></div>
-            </div>
-            <div class="side six">
-              <div class="dot six-1"></div>
-              <div class="dot six-2"></div>
-              <div class="dot six-3"></div>
-              <div class="dot six-4"></div>
-              <div class="dot six-5"></div>
-              <div class="dot six-6"></div>
-            </div>
-          </div>
-        </div>
-
         <!-- Graph Container -->
-        <div
-          class="h-72 w-full bg-white rounded-lg border-2 border-teal-100 p-4 pb-12 relative flex items-end justify-between px-8 shadow-inner"
-        >
-          <!-- Axis Lines with Arrows -->
-          <!-- Y-Axis Line -->
+        <div class="h-80 w-full relative pl-12 pr-4 pt-8 pb-12 mb-4">
+          <!-- Axis Labels (Adjusted to avoid overlapping) -->
           <div
-            class="absolute left-8 top-8 bottom-12 w-0.5 bg-slate-400 z-10 rounded-full"
-          >
-            <div
-              class="absolute -top-2 -left-[3px] w-0 h-0 border-x-[4px] border-x-transparent border-b-[8px] border-b-slate-400"
-            ></div>
-          </div>
-          <!-- X-Axis Line -->
-          <div
-            class="absolute left-8 right-6 bottom-12 h-0.5 bg-slate-400 z-10 rounded-full"
-          >
-            <div
-              class="absolute -right-2 -top-[3px] w-0 h-0 border-y-[4px] border-y-transparent border-l-[8px] border-l-slate-400"
-            ></div>
-          </div>
-
-          <!-- Axis Labels -->
-          <div
-            class="absolute top-2 left-4 text-sm text-slate-500 font-bold tracking-wide"
+            class="absolute left-0 -top-2 text-slate-500 font-bold text-sm tracking-wide"
           >
             Rolls
           </div>
           <div
-            class="absolute bottom-4 right-4 text-sm text-slate-500 font-bold tracking-wide"
+            class="absolute -right-2 bottom-2 text-slate-500 font-bold text-sm tracking-wide"
           >
             Sum
           </div>
 
-          <!-- Y-Axis (Dynamic) -->
+          <!-- Thick Axis Lines with Arrows -->
+          <!-- Y-Axis Line (Extends to top-6, giving arrow 24px clearance from the highest tick) -->
           <div
-            class="absolute left-1 w-5 top-8 bottom-12 flex flex-col justify-between items-end text-xs text-slate-400 font-bold"
+            class="absolute left-10 top-6 bottom-12 w-[3px] bg-slate-700 z-0 rounded-b-sm"
           >
-            <span id="y-max" class="-translate-y-2">10</span>
-            <span id="y-mid" class="translate-y-1">5</span>
-            <span class="translate-y-2">0</span>
+            <div
+              class="absolute -top-[10px] -left-[4.5px] w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-slate-700 border-t-0"
+            ></div>
+          </div>
+          <!-- X-Axis Line (Extends to right-6, giving arrow clearance from the last bar) -->
+          <div
+            class="absolute left-10 right-6 bottom-12 h-[3px] bg-slate-700 z-0 rounded-l-sm"
+          >
+            <div
+              class="absolute -right-[10px] -top-[4.5px] w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[10px] border-l-slate-700 border-r-0"
+            ></div>
           </div>
 
-          <!-- Bars generated by JS -->
+          <!-- Dynamic Y-Axis Ticks Container -->
+          <div
+            id="y-axis-container"
+            class="absolute left-0 top-12 bottom-12 w-10 z-0"
+          >
+            <!-- Ticks injected here by JS -->
+          </div>
+
+          <!-- Bars & X-Axis Container -->
           <div
             id="bars-container"
-            class="w-full h-full flex justify-between items-end gap-2 pl-4 pr-2 z-10"
+            class="absolute left-10 right-12 top-12 bottom-12 flex justify-between items-end gap-2 px-6 z-10"
           >
-            <!-- Bars will be injected here -->
+            <!-- Bars and X-ticks injected here by JS -->
+          </div>
+        </div>
+
+        <!-- Middle Dice Area (Slight negative margin anchors it between graph and controls) -->
+        <div class="flex justify-center -mt-10 mb-6 relative z-30">
+          <div
+            id="dice-overlay"
+            onclick="handleRoll(1)"
+            class="dice-container-wrapper drop-shadow-xl"
+            title="Click to roll 1x"
+          >
+            <div id="dice1" class="dice show-1">
+              <div class="side one"><div class="dot one-1"></div></div>
+              <div class="side two">
+                <div class="dot two-1"></div>
+                <div class="dot two-2"></div>
+              </div>
+              <div class="side three">
+                <div class="dot three-1"></div>
+                <div class="dot three-2"></div>
+                <div class="dot three-3"></div>
+              </div>
+              <div class="side four">
+                <div class="dot four-1"></div>
+                <div class="dot four-2"></div>
+                <div class="dot four-3"></div>
+                <div class="dot four-4"></div>
+              </div>
+              <div class="side five">
+                <div class="dot five-1"></div>
+                <div class="dot five-2"></div>
+                <div class="dot five-3"></div>
+                <div class="dot five-4"></div>
+                <div class="dot five-5"></div>
+              </div>
+              <div class="side six">
+                <div class="dot six-1"></div>
+                <div class="dot six-2"></div>
+                <div class="dot six-3"></div>
+                <div class="dot six-4"></div>
+                <div class="dot six-5"></div>
+                <div class="dot six-6"></div>
+              </div>
+            </div>
+            <div id="dice2" class="dice show-1">
+              <div class="side one"><div class="dot one-1"></div></div>
+              <div class="side two">
+                <div class="dot two-1"></div>
+                <div class="dot two-2"></div>
+              </div>
+              <div class="side three">
+                <div class="dot three-1"></div>
+                <div class="dot three-2"></div>
+                <div class="dot three-3"></div>
+              </div>
+              <div class="side four">
+                <div class="dot four-1"></div>
+                <div class="dot four-2"></div>
+                <div class="dot four-3"></div>
+                <div class="dot four-4"></div>
+              </div>
+              <div class="side five">
+                <div class="dot five-1"></div>
+                <div class="dot five-2"></div>
+                <div class="dot five-3"></div>
+                <div class="dot five-4"></div>
+                <div class="dot five-5"></div>
+              </div>
+              <div class="side six">
+                <div class="dot six-1"></div>
+                <div class="dot six-2"></div>
+                <div class="dot six-3"></div>
+                <div class="dot six-4"></div>
+                <div class="dot six-5"></div>
+                <div class="dot six-6"></div>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- PHASE 1: Controls -->
         <div
           id="rolling-phase"
-          class="mt-8 bg-slate-50 p-6 rounded-lg border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm"
+          class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm relative z-20"
         >
-          <div class="text-xl font-medium text-slate-600">
+          <div class="text-xl md:text-2xl font-medium text-slate-600">
             Roll the dice
-            <strong id="target-rolls-display" class="text-teal-600">100</strong>
+            <strong id="target-rolls-display" class="text-[#b12e8d]"
+              >100</strong
+            >
             times. Remaining:
-            <strong id="remaining-rolls-display" class="text-teal-600"
+            <strong id="remaining-rolls-display" class="text-[#b12e8d]"
               >100</strong
             >
           </div>
@@ -340,7 +331,7 @@
             <!-- Hidden entirely at first! -->
             <button
               id="btn-roll-batch"
-              class="hidden px-8 py-3 bg-[#f4d35e] hover:bg-[#e0c050] text-slate-800 font-extrabold rounded-lg transition-all shadow-md hover:-translate-y-1"
+              class="hidden px-8 py-3 bg-[#f4d35e] hover:bg-[#e0c050] text-slate-800 font-extrabold rounded-lg shadow-md transition-all hover:-translate-y-1"
             ></button>
           </div>
         </div>
@@ -348,7 +339,7 @@
         <!-- PHASE 2: Quiz -->
         <div
           id="quiz-phase"
-          class="hidden mt-8 bg-amber-50 p-6 rounded-lg border-2 border-amber-200 shadow-md relative"
+          class="hidden bg-emerald-50 p-6 rounded-xl border-2 border-emerald-200 shadow-md relative z-20"
         >
           <div
             class="flex flex-col md:flex-row items-center justify-between gap-6"
@@ -358,7 +349,7 @@
             >
               <span
                 id="q-number"
-                class="bg-amber-200 text-amber-800 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0"
+                class="bg-emerald-200 text-emerald-800 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0"
                 >1</span
               >
               <span id="q-text">Question text goes here?</span>
@@ -371,7 +362,7 @@
                   type="number"
                   id="q-input"
                   placeholder="?"
-                  class="w-32 h-14 rounded-lg border-2 border-slate-300 bg-white text-center text-2xl font-bold transition-colors outline-none focus:border-amber-400 text-slate-700"
+                  class="w-32 h-14 rounded-lg border-2 border-slate-300 bg-white text-center text-2xl font-bold transition-colors outline-none focus:border-emerald-500 text-slate-700"
                 />
                 <span
                   id="q-suffix"
@@ -380,7 +371,7 @@
               </div>
               <button
                 onclick="submitAnswer()"
-                class="h-14 px-6 bg-amber-400 hover:bg-amber-500 text-white font-bold text-xl rounded-lg shadow-sm transition-transform active:scale-95"
+                class="h-14 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl rounded-lg shadow-sm transition-transform active:scale-95"
               >
                 Check
               </button>
@@ -391,12 +382,12 @@
               <button
                 id="btn-choice-1"
                 onclick="submitChoice(this.innerText)"
-                class="px-8 py-4 text-2xl font-bold bg-white hover:bg-amber-100 hover:text-amber-700 rounded-lg transition-colors border-2 border-slate-200 hover:border-amber-400 shadow-sm"
+                class="px-8 py-4 text-2xl font-bold bg-white hover:bg-emerald-50 hover:text-emerald-700 rounded-lg transition-colors border-2 border-slate-300 hover:border-emerald-500 shadow-sm"
               ></button>
               <button
                 id="btn-choice-2"
                 onclick="submitChoice(this.innerText)"
-                class="px-8 py-4 text-2xl font-bold bg-white hover:bg-amber-100 hover:text-amber-700 rounded-lg transition-colors border-2 border-slate-200 hover:border-amber-400 shadow-sm"
+                class="px-8 py-4 text-2xl font-bold bg-white hover:bg-emerald-50 hover:text-emerald-700 rounded-lg transition-colors border-2 border-slate-300 hover:border-emerald-500 shadow-sm"
               ></button>
             </div>
           </div>
@@ -406,14 +397,14 @@
       <!-- PHASE 3: Outro -->
       <div
         id="outro-phase"
-        class="hidden absolute inset-0 bg-teal-600/95 backdrop-blur-md flex flex-col items-center justify-center z-50 p-6 text-center"
+        class="hidden absolute inset-0 bg-emerald-600/95 backdrop-blur-md flex flex-col items-center justify-center z-50 p-6 text-center"
       >
         <h2
-          class="text-6xl font-extrabold text-white mb-4 drop-shadow-xl tracking-wide"
+          class="text-6xl font-extrabold text-white mb-4 drop-shadow-lg tracking-wide"
         >
-          Awesome Job!
+          Excellent!
         </h2>
-        <p class="text-2xl text-teal-100 mb-8 max-w-md font-medium">
+        <p class="text-2xl text-emerald-100 mb-8 max-w-md font-medium">
           You've mastered bar graphs and probability!
         </p>
         <button
@@ -431,6 +422,7 @@
       let TARGET_ROLLS = 100;
       let totalRolls = 0;
       let manualRollsCount = 0; // Tracks manual single clicks
+      let sessionBatchSize = 25; // Holds constant throughout a single game session
       let rollsData = Array(11).fill(0); // Index 0 is sum 2, Index 10 is sum 12
       let isRolling = false;
 
@@ -441,63 +433,81 @@
       const elDiceOne = document.getElementById("dice1");
       const elDiceTwo = document.getElementById("dice2");
       const barsContainer = document.getElementById("bars-container");
-      const rollCounter = document.getElementById("roll-counter");
       const btnRollBatch = document.getElementById("btn-roll-batch");
       const targetDisplay = document.getElementById("target-rolls-display");
       const remainingDisplay = document.getElementById(
         "remaining-rolls-display",
       );
-      const yMaxEl = document.getElementById("y-max");
-      const yMidEl = document.getElementById("y-mid");
+      const yAxisContainer = document.getElementById("y-axis-container");
 
       // Initialize dynamic session values
       function initSession() {
         TARGET_ROLLS = Math.floor(Math.random() * 101) + 100; // 100 to 200
+        sessionBatchSize = Math.floor(Math.random() * 16) + 20; // 20 to 35, locked per session
         targetDisplay.innerText = TARGET_ROLLS;
         updateBatchButton();
       }
 
-      // Update the dynamic batch roll button
+      // Update the dynamic batch roll button (text remains constant!)
       function updateBatchButton() {
         const remaining = TARGET_ROLLS - totalRolls;
         remainingDisplay.innerText = remaining;
 
         if (remaining <= 0) return;
 
-        let batch = Math.floor(Math.random() * 16) + 20; // 20 to 35
-        if (batch > remaining) batch = remaining; // Cap at remaining
-
-        btnRollBatch.innerText = `Roll ${batch} times`;
-        btnRollBatch.onclick = () => handleRoll(batch);
+        // Text strictly stays constant for the entire session
+        btnRollBatch.innerText = `Roll ${sessionBatchSize} times`;
+        btnRollBatch.onclick = () => handleRoll(sessionBatchSize);
       }
 
-      // Setup Graph Bars initially
+      // Setup Graph Bars & X-Axis Ticks initially
       function initGraph() {
         barsContainer.innerHTML = "";
         for (let i = 2; i <= 12; i++) {
           const barWrapper = document.createElement("div");
           barWrapper.className =
-            "flex flex-col items-center justify-end h-full w-full max-w-[40px] group relative";
+            "flex flex-col items-center justify-end h-full w-full max-w-[50px] relative group";
           barWrapper.innerHTML = `
-                    <div id="pct-${i}" class="absolute -top-8 text-xs font-bold text-slate-500 opacity-0 transition-opacity whitespace-nowrap"></div>
-                    <div id="bar-${i}" class="bar-container w-full bg-teal-400 group-hover:bg-teal-300 rounded-t flex justify-center pt-1" style="height: 0%;">
-                        <span id="count-${i}" class="text-white text-xs font-bold drop-shadow-md hidden">0</span>
+                    <div id="pct-${i}" class="mb-1 text-xs font-bold text-slate-700 opacity-0 transition-opacity whitespace-nowrap">0%</div>
+                    <div id="bar-${i}" class="w-full bg-emerald-400 group-hover:bg-emerald-300 flex flex-col justify-start items-center transition-all duration-500 rounded-t-sm" style="height: 0%;">
+                        <span id="count-${i}" class="text-white text-xs font-bold mt-1 drop-shadow-md hidden">0</span>
                     </div>
-                    <div class="absolute -bottom-8 font-extrabold text-slate-600 text-lg">${i}</div>
+                    
+                    <!-- X-Axis Tick (Protrudes down through the axis) -->
+                    <div class="absolute -bottom-[4px] w-[3px] h-[8px] bg-slate-700 z-20"></div>
+                    
+                    <!-- X-Axis Label -->
+                    <div class="absolute -bottom-9 font-semibold text-slate-700 text-lg w-full text-center">${i}</div>
                 `;
           barsContainer.appendChild(barWrapper);
         }
+        updateGraph(true);
       }
 
       // Logic to update UI Graph based on data
-      function updateGraph() {
-        const maxY = Math.max(10, Math.ceil(Math.max(...rollsData) / 5) * 5);
-        yMaxEl.innerText = maxY;
-        yMidEl.innerText = Math.round(maxY / 2);
+      function updateGraph(isInit = false) {
+        const currentMax = Math.max(...rollsData);
+        // Dynamic max Y (multiples of 4 for nice ticks, minimum 4)
+        const maxY = Math.max(4, Math.ceil(currentMax / 4) * 4);
+
+        // Generate Thick Y-Axis Ticks dynamically
+        yAxisContainer.innerHTML = "";
+        const step = maxY / 4;
+        for (let i = 0; i <= 4; i++) {
+          const val = i * step;
+          const bottomPct = (i / 4) * 100;
+          yAxisContainer.innerHTML += `
+                    <div class="absolute w-full flex items-center justify-end" style="bottom: ${bottomPct}%;">
+                        <span class="text-sm font-semibold text-slate-700 mr-1 transform translate-y-1/2">${val}</span>
+                        <!-- Y-Axis Tick (Protrudes left from the axis) -->
+                        <div class="w-2 h-[3px] bg-slate-700 transform translate-y-1/2 translate-x-[3px] z-20"></div>
+                    </div>
+                `;
+        }
 
         rollsData.forEach((count, idx) => {
           const sum = idx + 2;
-          const heightPct = count === 0 ? 0 : Math.max(2, (count / maxY) * 100);
+          const heightPct = count === 0 ? 0 : (count / maxY) * 100;
           const percent =
             totalRolls > 0 ? ((count / totalRolls) * 100).toFixed(1) : 0;
 
@@ -506,11 +516,11 @@
           const pctEl = document.getElementById(`pct-${sum}`);
 
           barEl.style.height = `${heightPct}%`;
+          pctEl.innerText = `${parseFloat(percent)}%`;
 
           if (count > 0) {
             countEl.innerText = count;
             countEl.classList.remove("hidden");
-            pctEl.innerText = `${parseFloat(percent)}%`;
             pctEl.classList.remove("opacity-0");
             pctEl.classList.add("opacity-100");
           } else {
@@ -519,7 +529,6 @@
             pctEl.classList.add("opacity-0");
           }
         });
-        rollCounter.innerText = `${totalRolls} / ${TARGET_ROLLS}`;
       }
 
       // Handle the roll button click
@@ -535,6 +544,7 @@
           }
         }
 
+        // Math.min perfectly caps the rolls without changing the button text
         const actualTimes = Math.min(times, TARGET_ROLLS - totalRolls);
         let finalD1, finalD2;
 
@@ -657,10 +667,10 @@
       function startQuiz() {
         document.getElementById("rolling-phase").classList.add("hidden");
 
-        // Move dice slightly out of the way or fade them
-        document.getElementById("dice-overlay").style.transform =
-          "translate(-50%, 20px) scale(0.6)";
-        document.getElementById("dice-overlay").style.opacity = "0.5";
+        // Fade dice and shrink slightly during quiz
+        document.getElementById("dice-overlay").style.transform = "scale(0.8)";
+        document.getElementById("dice-overlay").style.opacity = "0.4";
+        document.getElementById("dice-overlay").style.pointerEvents = "none"; // Disable clicking
 
         questions = generateQuestionsArray();
         currentQIndex = 0;
@@ -680,14 +690,14 @@
         // Reset visuals
         qInput.value = "";
         qInput.className =
-          "w-32 h-14 rounded-lg border-2 border-slate-300 bg-white text-center text-2xl font-bold outline-none focus:border-amber-400 text-slate-700 transition-all";
+          "w-32 h-14 rounded-lg border-2 border-slate-300 bg-white text-center text-2xl font-bold outline-none focus:border-emerald-500 text-slate-700 transition-all";
 
         // Highlight relevant bar if applicable
         for (let i = 2; i <= 12; i++) {
           const bar = document.getElementById(`bar-${i}`);
           if (q.text.includes(i.toString())) {
-            bar.style.backgroundColor = "#fbbf24"; // amber-400
-            bar.style.boxShadow = "0 0 15px rgba(251,191,36,0.8)";
+            bar.style.backgroundColor = "#84cc16"; // lime-500
+            bar.style.boxShadow = "0 0 15px rgba(132, 204, 22, 0.8)";
           } else {
             bar.style.backgroundColor = ""; // reset to class hover colors
             bar.style.boxShadow = "none";
@@ -728,9 +738,9 @@
           if (uiElementToShake.tagName === "INPUT") {
             uiElementToShake.classList.replace(
               "border-slate-300",
-              "border-green-500",
+              "border-emerald-500",
             );
-            uiElementToShake.classList.add("bg-green-50", "text-green-700");
+            uiElementToShake.classList.add("bg-emerald-50", "text-emerald-700");
           }
           setTimeout(() => {
             currentQIndex++;
@@ -787,9 +797,9 @@
         document.getElementById("rolling-phase").classList.remove("hidden");
 
         // Reset Dice visuals
-        document.getElementById("dice-overlay").style.transform =
-          "translateX(-50%)";
+        document.getElementById("dice-overlay").style.transform = "";
         document.getElementById("dice-overlay").style.opacity = "1";
+        document.getElementById("dice-overlay").style.pointerEvents = "auto";
         for (let i = 1; i <= 6; i++) {
           elDiceOne.classList.remove("show-" + i);
           elDiceTwo.classList.remove("show-" + i);
