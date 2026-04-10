@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dice Graph Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* ==========================================
+           USER'S 3D DICE CSS WITH SLIGHT POSITION TWEAKS
+           ========================================== */
+      .dice-container-wrapper {
+        position: absolute;
+        top: 290px; /* Positioned right between graph and the below container */
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 20px;
+        pointer-events: auto; /* Let clicks register on the dice */
+        cursor: pointer;
+        z-index: 20;
+        perspective: 800px;
+        transition:
+          transform 0.2s ease-in-out,
+          opacity 0.5s;
+      }
+
+      /* Hover effect locked strictly to rotation from center */
+      .dice-container-wrapper:hover {
+        transform: translateX(-50%) rotate(8deg);
+      }
+
+      .dice {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        transform-style: preserve-3d;
+        transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+        font-size: 9.6px; /* Scales the em values for translation */
+      }
+
+      .dot {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        margin: -6px 0 0 -6px;
+        border-radius: 50%;
+        background-color: #f25f5c;
+        box-shadow: inset 2px 2px #d90429;
+      }
+
+      .side {
+        position: absolute;
+        background-color: #fff;
+        border-radius: 5px;
+        width: 60px;
+        height: 60px;
+        border: 1px solid #e5e5e5;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* 3D Box Construction */
+      .side:nth-child(1) {
+        transform: translateZ(3.1em);
+      }
+      .side:nth-child(6) {
+        transform: rotateY(90deg) translateZ(3.1em);
+      }
+      .side:nth-child(3) {
+        transform: rotateY(-90deg) translateZ(3.1em);
+      }
+      .side:nth-child(4) {
+        transform: rotateX(90deg) translateZ(3.1em);
+      }
+      .side:nth-child(5) {
+        transform: rotateX(-90deg) translateZ(3.1em);
+      }
+      .side:nth-child(2) {
+        transform: rotateY(-180deg) translateZ(3.1em);
+      }
+
+      /* Rotations for specific faces */
+      .show-1 {
+        transform: rotateX(720deg) rotateZ(-720deg);
+      }
+      .show-6 {
+        transform: rotateX(-900deg) rotateZ(1080deg);
+      }
+      .show-3 {
+        transform: rotateY(-450deg) rotateZ(-1440deg);
+      }
+      .show-4 {
+        transform: rotateY(810deg) rotateZ(720deg);
+      }
+      .show-5 {
+        transform: rotateX(-810deg) rotateZ(-1080deg);
+      }
+      .show-2 {
+        transform: rotateX(450deg) rotateZ(-720deg);
+      }
+
+      /* Dot Placements */
+      .two-1,
+      .three-1,
+      .four-1,
+      .five-1,
+      .six-1 {
+        top: 20%;
+        left: 20%;
+      }
+      .four-3,
+      .five-3,
+      .six-4 {
+        top: 20%;
+        left: 80%;
+      }
+      .one-1,
+      .three-2,
+      .five-5 {
+        top: 50%;
+        left: 50%;
+      }
+      .four-2,
+      .five-2,
+      .six-3 {
+        top: 80%;
+        left: 20%;
+      }
+      .two-2,
+      .three-3,
+      .four-4,
+      .five-4,
+      .six-6 {
+        top: 80%;
+        left: 80%;
+      }
+      .six-2 {
+        top: 50%;
+        left: 20%;
+      }
+      .six-5 {
+        top: 50%;
+        left: 80%;
+      }
+
+      /* ==========================================
+           GAME UI CSS
+           ========================================== */
+      body {
+        background-color: #70c1b3;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        overflow: hidden;
+      }
+
+      .bar-container {
+        transition: height 0.5s ease-out;
+      }
+
+      .shake {
+        animation: shake 0.4s ease-in-out;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        50% {
+          transform: translateX(5px);
+        }
+        75% {
+          transform: translateX(-5px);
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex items-center justify-center p-4">
+    <div
+      class="max-w-4xl w-full bg-white/90 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden relative border-4 border-white/50"
+    >
+      <!-- Header -->
+      <div
+        class="bg-teal-600 text-white p-4 flex justify-between items-center shadow-md"
+      >
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+          <span class="text-3xl">📊</span> Dice Graph Master
+        </h1>
+        <div class="text-lg font-medium bg-teal-800/40 px-4 py-1.5 rounded-md">
+          Rolls: <span id="roll-counter" class="font-bold">0 / 100</span>
+        </div>
+      </div>
+
+      <div class="p-6 relative">
+        <!-- 3D Dice Overlay (Removed tailwind hover classes to prevent position jumping) -->
+        <div
+          id="dice-overlay"
+          onclick="handleRoll(1)"
+          class="dice-container-wrapper drop-shadow-2xl opacity-100"
+          title="Click to roll 1x"
+        >
+          <div id="dice1" class="dice show-1">
+            <div class="side one"><div class="dot one-1"></div></div>
+            <div class="side two">
+              <div class="dot two-1"></div>
+              <div class="dot two-2"></div>
+            </div>
+            <div class="side three">
+              <div class="dot three-1"></div>
+              <div class="dot three-2"></div>
+              <div class="dot three-3"></div>
+            </div>
+            <div class="side four">
+              <div class="dot four-1"></div>
+              <div class="dot four-2"></div>
+              <div class="dot four-3"></div>
+              <div class="dot four-4"></div>
+            </div>
+            <div class="side five">
+              <div class="dot five-1"></div>
+              <div class="dot five-2"></div>
+              <div class="dot five-3"></div>
+              <div class="dot five-4"></div>
+              <div class="dot five-5"></div>
+            </div>
+            <div class="side six">
+              <div class="dot six-1"></div>
+              <div class="dot six-2"></div>
+              <div class="dot six-3"></div>
+              <div class="dot six-4"></div>
+              <div class="dot six-5"></div>
+              <div class="dot six-6"></div>
+            </div>
+          </div>
+          <div id="dice2" class="dice show-1">
+            <div class="side one"><div class="dot one-1"></div></div>
+            <div class="side two">
+              <div class="dot two-1"></div>
+              <div class="dot two-2"></div>
+            </div>
+            <div class="side three">
+              <div class="dot three-1"></div>
+              <div class="dot three-2"></div>
+              <div class="dot three-3"></div>
+            </div>
+            <div class="side four">
+              <div class="dot four-1"></div>
+              <div class="dot four-2"></div>
+              <div class="dot four-3"></div>
+              <div class="dot four-4"></div>
+            </div>
+            <div class="side five">
+              <div class="dot five-1"></div>
+              <div class="dot five-2"></div>
+              <div class="dot five-3"></div>
+              <div class="dot five-4"></div>
+              <div class="dot five-5"></div>
+            </div>
+            <div class="side six">
+              <div class="dot six-1"></div>
+              <div class="dot six-2"></div>
+              <div class="dot six-3"></div>
+              <div class="dot six-4"></div>
+              <div class="dot six-5"></div>
+              <div class="dot six-6"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graph Container -->
+        <div
+          class="h-72 w-full bg-white rounded-lg border-2 border-teal-100 p-4 pb-12 relative flex items-end justify-between px-8 shadow-inner"
+        >
+          <!-- Axis Lines with Arrows -->
+          <!-- Y-Axis Line -->
+          <div
+            class="absolute left-8 top-8 bottom-12 w-0.5 bg-slate-400 z-10 rounded-full"
+          >
+            <div
+              class="absolute -top-2 -left-[3px] w-0 h-0 border-x-[4px] border-x-transparent border-b-[8px] border-b-slate-400"
+            ></div>
+          </div>
+          <!-- X-Axis Line -->
+          <div
+            class="absolute left-8 right-6 bottom-12 h-0.5 bg-slate-400 z-10 rounded-full"
+          >
+            <div
+              class="absolute -right-2 -top-[3px] w-0 h-0 border-y-[4px] border-y-transparent border-l-[8px] border-l-slate-400"
+            ></div>
+          </div>
+
+          <!-- Axis Labels -->
+          <div
+            class="absolute top-2 left-4 text-sm text-slate-500 font-bold tracking-wide"
+          >
+            Rolls
+          </div>
+          <div
+            class="absolute bottom-4 right-4 text-sm text-slate-500 font-bold tracking-wide"
+          >
+            Sum
+          </div>
+
+          <!-- Y-Axis (Dynamic) -->
+          <div
+            class="absolute left-1 w-5 top-8 bottom-12 flex flex-col justify-between items-end text-xs text-slate-400 font-bold"
+          >
+            <span id="y-max" class="-translate-y-2">10</span>
+            <span id="y-mid" class="translate-y-1">5</span>
+            <span class="translate-y-2">0</span>
+          </div>
+
+          <!-- Bars generated by JS -->
+          <div
+            id="bars-container"
+            class="w-full h-full flex justify-between items-end gap-2 pl-4 pr-2 z-10"
+          >
+            <!-- Bars will be injected here -->
+          </div>
+        </div>
+
+        <!-- PHASE 1: Controls -->
+        <div
+          id="rolling-phase"
+          class="mt-8 bg-slate-50 p-6 rounded-lg border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm"
+        >
+          <div class="text-xl font-medium text-slate-600">
+            Roll the dice
+            <strong id="target-rolls-display" class="text-teal-600">100</strong>
+            times. Remaining:
+            <strong id="remaining-rolls-display" class="text-teal-600"
+              >100</strong
+            >
+          </div>
+          <div class="flex gap-3 h-12 items-center">
+            <!-- Hidden entirely at first! -->
+            <button
+              id="btn-roll-batch"
+              class="hidden px-8 py-3 bg-[#f4d35e] hover:bg-[#e0c050] text-slate-800 font-extrabold rounded-lg transition-all shadow-md hover:-translate-y-1"
+            ></button>
+          </div>
+        </div>
+
+        <!-- PHASE 2: Quiz -->
+        <div
+          id="quiz-phase"
+          class="hidden mt-8 bg-amber-50 p-6 rounded-lg border-2 border-amber-200 shadow-md relative"
+        >
+          <div
+            class="flex flex-col md:flex-row items-center justify-between gap-6"
+          >
+            <div
+              class="flex-1 text-xl md:text-2xl font-medium text-slate-700 flex items-center gap-3"
+            >
+              <span
+                id="q-number"
+                class="bg-amber-200 text-amber-800 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0"
+                >1</span
+              >
+              <span id="q-text">Question text goes here?</span>
+            </div>
+
+            <!-- Input Mode -->
+            <div id="input-container" class="flex gap-2 items-center hidden">
+              <div class="relative">
+                <input
+                  type="number"
+                  id="q-input"
+                  placeholder="?"
+                  class="w-32 h-14 rounded-lg border-2 border-slate-300 bg-white text-center text-2xl font-bold transition-colors outline-none focus:border-amber-400 text-slate-700"
+                />
+                <span
+                  id="q-suffix"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-lg text-slate-400 font-bold"
+                ></span>
+              </div>
+              <button
+                onclick="submitAnswer()"
+                class="h-14 px-6 bg-amber-400 hover:bg-amber-500 text-white font-bold text-xl rounded-lg shadow-sm transition-transform active:scale-95"
+              >
+                Check
+              </button>
+            </div>
+
+            <!-- Choice Mode -->
+            <div id="choice-container" class="flex gap-4 hidden">
+              <button
+                id="btn-choice-1"
+                onclick="submitChoice(this.innerText)"
+                class="px-8 py-4 text-2xl font-bold bg-white hover:bg-amber-100 hover:text-amber-700 rounded-lg transition-colors border-2 border-slate-200 hover:border-amber-400 shadow-sm"
+              ></button>
+              <button
+                id="btn-choice-2"
+                onclick="submitChoice(this.innerText)"
+                class="px-8 py-4 text-2xl font-bold bg-white hover:bg-amber-100 hover:text-amber-700 rounded-lg transition-colors border-2 border-slate-200 hover:border-amber-400 shadow-sm"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 3: Outro -->
+      <div
+        id="outro-phase"
+        class="hidden absolute inset-0 bg-teal-600/95 backdrop-blur-md flex flex-col items-center justify-center z-50 p-6 text-center"
+      >
+        <h2
+          class="text-6xl font-extrabold text-white mb-4 drop-shadow-xl tracking-wide"
+        >
+          Awesome Job!
+        </h2>
+        <p class="text-2xl text-teal-100 mb-8 max-w-md font-medium">
+          You've mastered bar graphs and probability!
+        </p>
+        <button
+          onclick="resetGame()"
+          class="px-10 py-5 bg-[#f4d35e] text-slate-800 font-extrabold text-2xl rounded-lg shadow-[0_6px_0_#d9b846] hover:bg-[#ffe373] active:translate-y-1 active:shadow-none transition-all flex items-center gap-3"
+        >
+          Play Again
+        </button>
+      </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+      // Constants & State
+      let TARGET_ROLLS = 100;
+      let totalRolls = 0;
+      let manualRollsCount = 0; // Tracks manual single clicks
+      let rollsData = Array(11).fill(0); // Index 0 is sum 2, Index 10 is sum 12
+      let isRolling = false;
+
+      let questions = [];
+      let currentQIndex = 0;
+
+      // DOM Elements
+      const elDiceOne = document.getElementById("dice1");
+      const elDiceTwo = document.getElementById("dice2");
+      const barsContainer = document.getElementById("bars-container");
+      const rollCounter = document.getElementById("roll-counter");
+      const btnRollBatch = document.getElementById("btn-roll-batch");
+      const targetDisplay = document.getElementById("target-rolls-display");
+      const remainingDisplay = document.getElementById(
+        "remaining-rolls-display",
+      );
+      const yMaxEl = document.getElementById("y-max");
+      const yMidEl = document.getElementById("y-mid");
+
+      // Initialize dynamic session values
+      function initSession() {
+        TARGET_ROLLS = Math.floor(Math.random() * 101) + 100; // 100 to 200
+        targetDisplay.innerText = TARGET_ROLLS;
+        updateBatchButton();
+      }
+
+      // Update the dynamic batch roll button
+      function updateBatchButton() {
+        const remaining = TARGET_ROLLS - totalRolls;
+        remainingDisplay.innerText = remaining;
+
+        if (remaining <= 0) return;
+
+        let batch = Math.floor(Math.random() * 16) + 20; // 20 to 35
+        if (batch > remaining) batch = remaining; // Cap at remaining
+
+        btnRollBatch.innerText = `Roll ${batch} times`;
+        btnRollBatch.onclick = () => handleRoll(batch);
+      }
+
+      // Setup Graph Bars initially
+      function initGraph() {
+        barsContainer.innerHTML = "";
+        for (let i = 2; i <= 12; i++) {
+          const barWrapper = document.createElement("div");
+          barWrapper.className =
+            "flex flex-col items-center justify-end h-full w-full max-w-[40px] group relative";
+          barWrapper.innerHTML = `
+                    <div id="pct-${i}" class="absolute -top-8 text-xs font-bold text-slate-500 opacity-0 transition-opacity whitespace-nowrap"></div>
+                    <div id="bar-${i}" class="bar-container w-full bg-teal-400 group-hover:bg-teal-300 rounded-t flex justify-center pt-1" style="height: 0%;">
+                        <span id="count-${i}" class="text-white text-xs font-bold drop-shadow-md hidden">0</span>
+                    </div>
+                    <div class="absolute -bottom-8 font-extrabold text-slate-600 text-lg">${i}</div>
+                `;
+          barsContainer.appendChild(barWrapper);
+        }
+      }
+
+      // Logic to update UI Graph based on data
+      function updateGraph() {
+        const maxY = Math.max(10, Math.ceil(Math.max(...rollsData) / 5) * 5);
+        yMaxEl.innerText = maxY;
+        yMidEl.innerText = Math.round(maxY / 2);
+
+        rollsData.forEach((count, idx) => {
+          const sum = idx + 2;
+          const heightPct = count === 0 ? 0 : Math.max(2, (count / maxY) * 100);
+          const percent =
+            totalRolls > 0 ? ((count / totalRolls) * 100).toFixed(1) : 0;
+
+          const barEl = document.getElementById(`bar-${sum}`);
+          const countEl = document.getElementById(`count-${sum}`);
+          const pctEl = document.getElementById(`pct-${sum}`);
+
+          barEl.style.height = `${heightPct}%`;
+
+          if (count > 0) {
+            countEl.innerText = count;
+            countEl.classList.remove("hidden");
+            pctEl.innerText = `${parseFloat(percent)}%`;
+            pctEl.classList.remove("opacity-0");
+            pctEl.classList.add("opacity-100");
+          } else {
+            countEl.classList.add("hidden");
+            pctEl.classList.remove("opacity-100");
+            pctEl.classList.add("opacity-0");
+          }
+        });
+        rollCounter.innerText = `${totalRolls} / ${TARGET_ROLLS}`;
+      }
+
+      // Handle the roll button click
+      function handleRoll(times) {
+        if (isRolling || totalRolls >= TARGET_ROLLS) return;
+        isRolling = true;
+
+        // Tracking single rolls to unhide batch button
+        if (times === 1) {
+          manualRollsCount++;
+          if (manualRollsCount >= 4) {
+            btnRollBatch.classList.remove("hidden");
+          }
+        }
+
+        const actualTimes = Math.min(times, TARGET_ROLLS - totalRolls);
+        let finalD1, finalD2;
+
+        // Compute math silently
+        for (let i = 0; i < actualTimes; i++) {
+          finalD1 = Math.floor(Math.random() * 6) + 1;
+          finalD2 = Math.floor(Math.random() * 6) + 1;
+          rollsData[finalD1 + finalD2 - 2]++;
+        }
+
+        // GUARANTEED ROLL ANIMATION
+        const isBatch = times > 1;
+        const totalAnimTime = isBatch ? 2800 : 1000; // Much longer for batch rolls
+        const scrambleTime = totalAnimTime - 800; // Subtract 800ms to allow smooth landing
+
+        let scrambleInterval;
+
+        if (isBatch) {
+          // Slower continuous tumble for batch rolls
+          elDiceOne.style.transition = "transform 0.25s linear";
+          elDiceTwo.style.transition = "transform 0.25s linear";
+          scrambleInterval = setInterval(() => {
+            elDiceOne.style.transform = `rotateX(${Math.random() * 720}deg) rotateY(${Math.random() * 720}deg) translateZ(3.1em) scale(0.8)`;
+            elDiceTwo.style.transform = `rotateX(${Math.random() * 720}deg) rotateY(${Math.random() * 720}deg) translateZ(3.1em) scale(0.8)`;
+          }, 250);
+        } else {
+          // Quick jumble for single roll
+          elDiceOne.style.transition =
+            "transform 0.2s cubic-bezier(0.1, 0.8, 0.2, 1)";
+          elDiceTwo.style.transition =
+            "transform 0.2s cubic-bezier(0.1, 0.8, 0.2, 1)";
+          elDiceOne.style.transform = `rotateX(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateZ(3.1em) scale(0.8)`;
+          elDiceTwo.style.transform = `rotateX(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateZ(3.1em) scale(0.8)`;
+        }
+
+        // Snap to correct final class
+        setTimeout(() => {
+          if (isBatch) clearInterval(scrambleInterval);
+
+          elDiceOne.style.transition =
+            "transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)";
+          elDiceTwo.style.transition =
+            "transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)";
+
+          elDiceOne.style.transform = "";
+          elDiceTwo.style.transform = "";
+
+          for (let i = 1; i <= 6; i++) {
+            elDiceOne.classList.remove("show-" + i);
+            elDiceTwo.classList.remove("show-" + i);
+          }
+          elDiceOne.classList.add("show-" + finalD1);
+          elDiceTwo.classList.add("show-" + finalD2);
+        }, scrambleTime);
+
+        // Wait for the CSS transform to finish before updating graph
+        setTimeout(() => {
+          totalRolls += actualTimes;
+          updateGraph();
+          updateBatchButton();
+          isRolling = false;
+
+          if (totalRolls >= TARGET_ROLLS) {
+            setTimeout(startQuiz, 1000);
+          }
+        }, totalAnimTime);
+      }
+
+      // Question Generation Logic
+      function generateQuestionsArray() {
+        const qs = [];
+        // 1. Mode
+        let maxCount = -1;
+        let modeSum = -1;
+        rollsData.forEach((count, i) => {
+          if (count > maxCount) {
+            maxCount = count;
+            modeSum = i + 2;
+          }
+        });
+        qs.push({
+          type: "input",
+          text: "What sum occurred the most often?",
+          answer: modeSum.toString(),
+          suffix: "",
+        });
+
+        // 2. Percentage
+        const validIndices = rollsData
+          .map((c, i) => (c > 0 ? i : -1))
+          .filter((i) => i !== -1);
+        const randIndex =
+          validIndices[Math.floor(Math.random() * validIndices.length)] || 5;
+        const randSum = randIndex + 2;
+        const percent = ((rollsData[randIndex] / TARGET_ROLLS) * 100).toFixed(
+          1,
+        );
+        qs.push({
+          type: "input",
+          text: `What percent of the rolls had a sum of ${randSum}?`,
+          answer: parseFloat(percent).toString(),
+          suffix: "%",
+        });
+
+        // 3. Comparison
+        let sumA = Math.floor(Math.random() * 4) + 3; // 3-6
+        let sumB = Math.floor(Math.random() * 4) + 8; // 8-11
+        let moreFreq = rollsData[sumA - 2] >= rollsData[sumB - 2] ? sumA : sumB;
+        qs.push({
+          type: "choice",
+          text: `What sum occurred more frequently, ${sumA} or ${sumB}?`,
+          options: [sumA, sumB],
+          answer: moreFreq.toString(),
+        });
+
+        return qs;
+      }
+
+      // Phase Transitions
+      function startQuiz() {
+        document.getElementById("rolling-phase").classList.add("hidden");
+
+        // Move dice slightly out of the way or fade them
+        document.getElementById("dice-overlay").style.transform =
+          "translate(-50%, 20px) scale(0.6)";
+        document.getElementById("dice-overlay").style.opacity = "0.5";
+
+        questions = generateQuestionsArray();
+        currentQIndex = 0;
+        document.getElementById("quiz-phase").classList.remove("hidden");
+        renderQuestion();
+      }
+
+      function renderQuestion() {
+        const q = questions[currentQIndex];
+        document.getElementById("q-number").innerText = currentQIndex + 1;
+        document.getElementById("q-text").innerText = q.text;
+
+        const inputContainer = document.getElementById("input-container");
+        const choiceContainer = document.getElementById("choice-container");
+        const qInput = document.getElementById("q-input");
+
+        // Reset visuals
+        qInput.value = "";
+        qInput.className =
+          "w-32 h-14 rounded-lg border-2 border-slate-300 bg-white text-center text-2xl font-bold outline-none focus:border-amber-400 text-slate-700 transition-all";
+
+        // Highlight relevant bar if applicable
+        for (let i = 2; i <= 12; i++) {
+          const bar = document.getElementById(`bar-${i}`);
+          if (q.text.includes(i.toString())) {
+            bar.style.backgroundColor = "#fbbf24"; // amber-400
+            bar.style.boxShadow = "0 0 15px rgba(251,191,36,0.8)";
+          } else {
+            bar.style.backgroundColor = ""; // reset to class hover colors
+            bar.style.boxShadow = "none";
+          }
+        }
+
+        if (q.type === "input") {
+          inputContainer.classList.remove("hidden");
+          choiceContainer.classList.add("hidden");
+          document.getElementById("q-suffix").innerText = q.suffix;
+          qInput.focus();
+        } else {
+          inputContainer.classList.add("hidden");
+          choiceContainer.classList.remove("hidden");
+          document.getElementById("btn-choice-1").innerText = q.options[0];
+          document.getElementById("btn-choice-2").innerText = q.options[1];
+        }
+      }
+
+      // Check Answer Handlers
+      function submitAnswer() {
+        const val = document.getElementById("q-input").value;
+        validateAndProceed(val, document.getElementById("q-input"));
+      }
+
+      function submitChoice(val) {
+        // Need a reference element for shaking, use the quiz phase container
+        validateAndProceed(val, document.getElementById("quiz-phase"));
+      }
+
+      function validateAndProceed(userVal, uiElementToShake) {
+        if (userVal === "") return;
+        const q = questions[currentQIndex];
+        const isCorrect = parseFloat(userVal) === parseFloat(q.answer);
+
+        if (isCorrect) {
+          // Correct animation
+          if (uiElementToShake.tagName === "INPUT") {
+            uiElementToShake.classList.replace(
+              "border-slate-300",
+              "border-green-500",
+            );
+            uiElementToShake.classList.add("bg-green-50", "text-green-700");
+          }
+          setTimeout(() => {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+              renderQuestion();
+            } else {
+              showOutro();
+            }
+          }, 1000);
+        } else {
+          // Incorrect animation
+          if (uiElementToShake.tagName === "INPUT") {
+            uiElementToShake.classList.replace(
+              "border-slate-300",
+              "border-red-500",
+            );
+            uiElementToShake.classList.add("bg-red-50", "text-red-700");
+          }
+          uiElementToShake.classList.add("shake");
+          setTimeout(() => {
+            uiElementToShake.classList.remove("shake");
+            if (uiElementToShake.tagName === "INPUT") {
+              uiElementToShake.classList.replace(
+                "border-red-500",
+                "border-slate-300",
+              );
+              uiElementToShake.classList.remove("bg-red-50", "text-red-700");
+            }
+          }, 400);
+        }
+      }
+
+      // Handle Enter key for input
+      document
+        .getElementById("q-input")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") submitAnswer();
+        });
+
+      function showOutro() {
+        document.getElementById("quiz-phase").classList.add("hidden");
+        document.getElementById("outro-phase").classList.remove("hidden");
+      }
+
+      function resetGame() {
+        totalRolls = 0;
+        manualRollsCount = 0;
+        rollsData = Array(11).fill(0);
+
+        // Reset phases
+        btnRollBatch.classList.add("hidden");
+        document.getElementById("outro-phase").classList.add("hidden");
+        document.getElementById("quiz-phase").classList.add("hidden");
+        document.getElementById("rolling-phase").classList.remove("hidden");
+
+        // Reset Dice visuals
+        document.getElementById("dice-overlay").style.transform =
+          "translateX(-50%)";
+        document.getElementById("dice-overlay").style.opacity = "1";
+        for (let i = 1; i <= 6; i++) {
+          elDiceOne.classList.remove("show-" + i);
+          elDiceTwo.classList.remove("show-" + i);
+        }
+        elDiceOne.classList.add("show-1");
+        elDiceTwo.classList.add("show-1");
+
+        // Setup a new random target and batch
+        initSession();
+
+        // Reset Graph
+        for (let i = 2; i <= 12; i++) {
+          const bar = document.getElementById(`bar-${i}`);
+          if (bar) {
+            bar.style.backgroundColor = "";
+            bar.style.boxShadow = "none";
+          }
+        }
+        updateGraph();
+      }
+
+      // Initialize
+      initSession();
+      initGraph();
+    </script>
+  </body>
+</html>
