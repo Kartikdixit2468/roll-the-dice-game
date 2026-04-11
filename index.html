@@ -20,6 +20,12 @@
         transition: transform 0.2s ease-in-out;
       }
 
+      .dice-container-wrapper.is-rolling,
+      .dice-container-wrapper.is-rolling:hover {
+        transform: none;
+        cursor: default;
+      }
+
       /* Hover effect locked strictly to rotation from center */
       .dice-container-wrapper:hover {
         transform: rotate(8deg) scale(1.05);
@@ -30,8 +36,17 @@
         width: 60px;
         height: 60px;
         transform-style: preserve-3d;
-        transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        will-change: transform;
         font-size: 9.6px; /* Scales the em values for translation */
+      }
+
+      .dice.scrambling {
+        transition: transform 0.22s linear;
+      }
+
+      .dice.settling {
+        transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .dot {
@@ -432,6 +447,7 @@
       // DOM Elements
       const elDiceOne = document.getElementById("dice1");
       const elDiceTwo = document.getElementById("dice2");
+      const diceOverlay = document.getElementById("dice-overlay");
       const barsContainer = document.getElementById("bars-container");
       const btnRollBatch = document.getElementById("btn-roll-batch");
       const targetDisplay = document.getElementById("target-rolls-display");
@@ -531,8 +547,57 @@
         });
       }
 
+      function setDiceFace(diceEl, face) {
+        for (let i = 1; i <= 6; i++) {
+          diceEl.classList.remove("show-" + i);
+        }
+        diceEl.classList.add("show-" + face);
+      }
+
+      function randomFace() {
+        return Math.floor(Math.random() * 6) + 1;
+      }
+
+      function runDiceAnimation(finalD1, finalD2, config) {
+        const { scrambleDuration, settleDuration, tickMs } = config;
+
+        diceOverlay.classList.add("is-rolling");
+        elDiceOne.classList.add("scrambling");
+        elDiceTwo.classList.add("scrambling");
+
+        // Start with an immediate face change so the roll feels responsive.
+        setDiceFace(elDiceOne, randomFace());
+        setDiceFace(elDiceTwo, randomFace());
+
+        return new Promise((resolve) => {
+          const scrambleTimer = setInterval(() => {
+            setDiceFace(elDiceOne, randomFace());
+            setDiceFace(elDiceTwo, randomFace());
+          }, tickMs);
+
+          setTimeout(() => {
+            clearInterval(scrambleTimer);
+
+            elDiceOne.classList.remove("scrambling");
+            elDiceTwo.classList.remove("scrambling");
+            elDiceOne.classList.add("settling");
+            elDiceTwo.classList.add("settling");
+
+            setDiceFace(elDiceOne, finalD1);
+            setDiceFace(elDiceTwo, finalD2);
+
+            setTimeout(() => {
+              elDiceOne.classList.remove("settling");
+              elDiceTwo.classList.remove("settling");
+              diceOverlay.classList.remove("is-rolling");
+              resolve();
+            }, settleDuration);
+          }, scrambleDuration);
+        });
+      }
+
       // Handle the roll button click
-      function handleRoll(times) {
+      async function handleRoll(times) {
         if (isRolling || totalRolls >= TARGET_ROLLS) return;
         isRolling = true;
 
@@ -546,6 +611,11 @@
 
         // Math.min perfectly caps the rolls without changing the button text
         const actualTimes = Math.min(times, TARGET_ROLLS - totalRolls);
+        if (actualTimes <= 0) {
+          isRolling = false;
+          return;
+        }
+
         let finalD1, finalD2;
 
         // Compute math silently
@@ -555,62 +625,21 @@
           rollsData[finalD1 + finalD2 - 2]++;
         }
 
-        // GUARANTEED ROLL ANIMATION
         const isBatch = times > 1;
-        const totalAnimTime = isBatch ? 2800 : 1000; // Much longer for batch rolls
-        const scrambleTime = totalAnimTime - 800; // Subtract 800ms to allow smooth landing
+        const animationConfig = isBatch
+          ? { scrambleDuration: 1900, settleDuration: 700, tickMs: 130 }
+          : { scrambleDuration: 480, settleDuration: 420, tickMs: 90 };
 
-        let scrambleInterval;
+        await runDiceAnimation(finalD1, finalD2, animationConfig);
 
-        if (isBatch) {
-          // Slower continuous tumble for batch rolls
-          elDiceOne.style.transition = "transform 0.25s linear";
-          elDiceTwo.style.transition = "transform 0.25s linear";
-          scrambleInterval = setInterval(() => {
-            elDiceOne.style.transform = `rotateX(${Math.random() * 720}deg) rotateY(${Math.random() * 720}deg) translateZ(3.1em) scale(0.8)`;
-            elDiceTwo.style.transform = `rotateX(${Math.random() * 720}deg) rotateY(${Math.random() * 720}deg) translateZ(3.1em) scale(0.8)`;
-          }, 250);
-        } else {
-          // Quick jumble for single roll
-          elDiceOne.style.transition =
-            "transform 0.2s cubic-bezier(0.1, 0.8, 0.2, 1)";
-          elDiceTwo.style.transition =
-            "transform 0.2s cubic-bezier(0.1, 0.8, 0.2, 1)";
-          elDiceOne.style.transform = `rotateX(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateZ(3.1em) scale(0.8)`;
-          elDiceTwo.style.transform = `rotateX(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateZ(3.1em) scale(0.8)`;
+        totalRolls += actualTimes;
+        updateGraph();
+        updateBatchButton();
+        isRolling = false;
+
+        if (totalRolls >= TARGET_ROLLS) {
+          setTimeout(startQuiz, 1000);
         }
-
-        // Snap to correct final class
-        setTimeout(() => {
-          if (isBatch) clearInterval(scrambleInterval);
-
-          elDiceOne.style.transition =
-            "transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)";
-          elDiceTwo.style.transition =
-            "transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)";
-
-          elDiceOne.style.transform = "";
-          elDiceTwo.style.transform = "";
-
-          for (let i = 1; i <= 6; i++) {
-            elDiceOne.classList.remove("show-" + i);
-            elDiceTwo.classList.remove("show-" + i);
-          }
-          elDiceOne.classList.add("show-" + finalD1);
-          elDiceTwo.classList.add("show-" + finalD2);
-        }, scrambleTime);
-
-        // Wait for the CSS transform to finish before updating graph
-        setTimeout(() => {
-          totalRolls += actualTimes;
-          updateGraph();
-          updateBatchButton();
-          isRolling = false;
-
-          if (totalRolls >= TARGET_ROLLS) {
-            setTimeout(startQuiz, 1000);
-          }
-        }, totalAnimTime);
       }
 
       // Question Generation Logic
@@ -797,9 +826,12 @@
         document.getElementById("rolling-phase").classList.remove("hidden");
 
         // Reset Dice visuals
-        document.getElementById("dice-overlay").style.transform = "";
-        document.getElementById("dice-overlay").style.opacity = "1";
-        document.getElementById("dice-overlay").style.pointerEvents = "auto";
+        diceOverlay.style.transform = "";
+        diceOverlay.style.opacity = "1";
+        diceOverlay.style.pointerEvents = "auto";
+        diceOverlay.classList.remove("is-rolling");
+        elDiceOne.classList.remove("scrambling", "settling");
+        elDiceTwo.classList.remove("scrambling", "settling");
         for (let i = 1; i <= 6; i++) {
           elDiceOne.classList.remove("show-" + i);
           elDiceTwo.classList.remove("show-" + i);
