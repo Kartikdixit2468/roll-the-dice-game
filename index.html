@@ -3,32 +3,331 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dice Graph Master</title>
+    <title>Spidey's Dice Graph Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       /* ==========================================
-           CLEAN 3D DICE CSS (Cream & Forest Green)
-           ========================================== */
+         BASE LAYOUT & BACKGROUND
+         ========================================== */
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at center, #1e3a8a, #0f172a);
+        overflow-x: hidden;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        color: #e2e8f0; /* Dark mode text base */
+      }
+
+      /* ==========================================
+         SPIDER-MAN ARTWORK CSS
+         ========================================== */
+      .spidey-container {
+        font-size: 18px; /* INCREASED SIZE: Scales Spidey perfectly */
+        position: absolute;
+        width: 21.87em;
+        height: 31.25em;
+        top: 0;
+      }
+
+      .center {
+        position: absolute;
+        transform: translateX(-50%);
+        left: 50%;
+      }
+
+      .rope {
+        height: 18em;
+        width: 0.15em;
+        background-color: #ffffff;
+        animation: swing 2.5s infinite ease-in-out;
+        transform-origin: top;
+      }
+
+      /* Endless rope extension */
+      .rope::before {
+        content: "";
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: #ffffff;
+      }
+
+      @keyframes swing {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-3em);
+        }
+      }
+
+      .legs {
+        height: 1.12em;
+        width: 7.5em;
+        background-color: transparent;
+        box-shadow:
+          0 0 0 0.12em #140243,
+          0 0 0 1.06em #1b1676,
+          0 0 0 1.18em #140243;
+        top: 16em;
+        border-radius: 3.12em;
+      }
+
+      .boot-l,
+      .boot-r {
+        height: 1.25em;
+        width: 2.5em;
+        background-color: #e32832;
+        position: absolute;
+        border: 0.12em solid #140243;
+        bottom: 1.12em;
+      }
+      .boot-l {
+        left: 1em;
+      }
+      .boot-r {
+        transform: rotateY(180deg);
+        left: 3.81em;
+      }
+
+      .boot-l:before,
+      .boot-r:before {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-bottom: 1.12em solid #140243;
+        border-left: 1.18em solid transparent;
+        bottom: 1.31em;
+        left: 1.46em;
+      }
+      .boot-l:after,
+      .boot-r:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-bottom: 1.12em solid #e32832;
+        border-left: 1em solid transparent;
+        right: 0;
+        top: -0.93em;
+      }
+
+      .costume {
+        height: 6.25em;
+        width: 5.62em;
+        background: linear-gradient(
+          to right,
+          #1b1676 20%,
+          #e32832 20%,
+          #e32832 80%,
+          #1b1676 80%
+        );
+        border: 0.12em solid #140243;
+        top: 18.18em;
+      }
+
+      .spider {
+        height: 1.87em;
+        width: 0.93em;
+        background-color: #140243;
+        border-radius: 45%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        top: calc(50% + 0.93em);
+        left: 50%;
+      }
+
+      .s1,
+      .s3 {
+        height: 7.5em;
+        width: 2.5em;
+        border-radius: 0 0 1.37em 1.37em;
+        border-bottom: 0.12em solid #140243;
+        position: absolute;
+      }
+      .s2,
+      .s4 {
+        height: 7.5em;
+        width: 3.12em;
+        border-radius: 0 0 1.56em 1.56em;
+        border-bottom: 0.12em solid #140243;
+        position: absolute;
+      }
+      .s1,
+      .s2,
+      .s3,
+      .s4 {
+        left: 50%;
+      }
+      .s1 {
+        bottom: 1.43em;
+      }
+      .s2 {
+        bottom: 0.93em;
+      }
+      .s3,
+      .s4 {
+        transform: translateX(-50%) rotateX(180deg);
+      }
+      .s3 {
+        top: 1.43em;
+      }
+      .s4 {
+        top: 0.93em;
+      }
+
+      .belt {
+        height: 0.43em;
+        width: 5.87em;
+        background-color: #e32832;
+        border: 0.12em solid #140243;
+        top: -0.12em;
+      }
+
+      .hand-r,
+      .hand-l {
+        height: 8.12em;
+        background: linear-gradient(
+          #e32832 4.6em,
+          #140243 4.6em,
+          #140243 4.75em,
+          #1b1676 4.75em,
+          #1b1676 8.12em
+        );
+        width: 1.12em;
+        border: 0.12em solid #140243;
+        border-radius: 1.25em;
+        position: absolute;
+        transform-origin: bottom;
+        bottom: -0.12em;
+      }
+      .hand-r {
+        right: -0.75em;
+        transform: rotate(-22deg);
+      }
+      .hand-l {
+        left: -0.75em;
+        transform: rotate(22deg);
+      }
+
+      .neck {
+        height: 0.37em;
+        width: 1.25em;
+        background-color: #e32832;
+        bottom: -0.62em;
+        border: 0.12em solid #140243;
+      }
+
+      .mask {
+        height: 4.65em;
+        width: 4.06em;
+        background-color: #e32832;
+        border-radius: 50% 50% 50% 50% / 54% 54% 46% 46%;
+        border: 0.12em solid #140243;
+        top: 6.56em;
+      }
+
+      .eye-l,
+      .eye-r {
+        height: 0.68em;
+        width: 1.37em;
+        background-color: #ffffff;
+        border-radius: 1.37em 1.37em 0 0;
+        border: 0.12em solid #140243;
+        position: absolute;
+        top: 2.1em;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .eye-l {
+        left: 0.3em;
+      }
+      .eye-r {
+        right: 0.3em;
+      }
+
+      .btn-pupil {
+        width: 0.38em;
+        height: 0.38em;
+        background-color: #140243;
+        border-radius: 50%;
+        transition: transform 100ms ease-out; /* Tuned for smooth JS Tracking */
+      }
+      .btn-lid {
+        position: absolute;
+        top: -0.12em;
+        left: -0.12em;
+        right: -0.12em;
+        height: 100%;
+        background-color: #e32832;
+        border-bottom: 0.12em solid #140243;
+        transform: translateY(-100%);
+        transition: transform 150ms ease-in-out;
+        z-index: 2;
+      }
+
+      .mask:hover .btn-lid {
+        transform: translateY(-40%);
+      }
+      .mask:hover .btn-pupil {
+        transform: translate(0, 0) !important;
+      }
+      .mask:active .btn-pupil {
+        animation: agitate 100ms infinite;
+      }
+
+      .cover {
+        height: 3.12em;
+        width: 0.15em;
+        background-color: #ffffff;
+        bottom: 8.12em;
+      }
+
+      @keyframes agitate {
+        0% {
+          transform: translate(0%, -10%);
+        }
+        25% {
+          transform: translate(-10%, 10%);
+        }
+        50% {
+          transform: translate(10%, -5%);
+        }
+        75% {
+          transform: translate(-10%, -5%);
+        }
+        100% {
+          transform: translate(10%, 10%);
+        }
+      }
+
+      /* ==========================================
+         SPIDEY THEMED 3D DICE CSS
+         ========================================== */
       .dice-container-wrapper {
         position: relative;
         display: flex;
         justify-content: center;
         gap: 20px;
-        pointer-events: auto; /* Let clicks register on the dice */
-        cursor: pointer;
         perspective: 800px;
         transition: transform 0.2s ease-in-out;
       }
-
+      .dice-container-wrapper:hover {
+        transform: rotate(8deg) scale(1.05);
+      }
       .dice-container-wrapper.is-rolling,
       .dice-container-wrapper.is-rolling:hover {
         transform: none;
         cursor: default;
-      }
-
-      /* Hover effect locked strictly to rotation from center */
-      .dice-container-wrapper:hover {
-        transform: rotate(8deg) scale(1.05);
       }
 
       .dice {
@@ -38,35 +337,32 @@
         transform-style: preserve-3d;
         transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         will-change: transform;
-        font-size: 9.6px; /* Scales the em values for translation */
+        font-size: 9.6px;
       }
-
       .dice.scrambling {
         transition: transform 0.22s linear;
       }
-
       .dice.settling {
         transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
+      .side {
+        position: absolute;
+        border-radius: 5px;
+        width: 60px;
+        height: 60px;
+        background-color: #e32832;
+        border: 1px solid #7f1d1d;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+      }
       .dot {
         position: absolute;
         width: 12px;
         height: 12px;
         margin: -6px 0 0 -6px;
         border-radius: 50%;
-        background-color: #064e3b; /* Dark forest green */
-        box-shadow: inset 2px 2px #022c22;
-      }
-
-      .side {
-        position: absolute;
-        background-color: #fdfbf5; /* Cream/off-white */
-        border-radius: 5px;
-        width: 60px;
-        height: 60px;
-        border: 1px solid #d6d3d1;
-        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+        box-shadow: inset 2px 2px #b91c26;
       }
 
       /* 3D Box Construction */
@@ -89,7 +385,6 @@
         transform: rotateY(-180deg) translateZ(3.1em);
       }
 
-      /* Rotations for specific faces */
       .show-1 {
         transform: rotateX(720deg) rotateZ(-720deg);
       }
@@ -109,7 +404,6 @@
         transform: rotateX(450deg) rotateZ(-720deg);
       }
 
-      /* Dot Placements */
       .two-1,
       .three-1,
       .four-1,
@@ -153,19 +447,6 @@
         left: 80%;
       }
 
-      /* ==========================================
-           GAME UI CSS
-           ========================================== */
-      body {
-        background-color: #ecfdf5; /* Very soft emerald/mint */
-        font-family:
-          system-ui,
-          -apple-system,
-          sans-serif;
-        overflow-x: hidden;
-        color: #334155;
-      }
-
       .shake {
         animation: shake 0.4s ease-in-out;
       }
@@ -184,263 +465,543 @@
           transform: translateX(-5px);
         }
       }
+
+      /* Landscape phone styling */
+      @media (orientation: landscape) and (max-height: 520px) and (max-width: 950px) {
+        body {
+          padding: 0.4rem !important;
+          align-items: flex-start;
+          overflow-y: auto;
+        }
+        #main-layout {
+          width: 100%;
+          border-radius: 0.85rem;
+        }
+        #graph-stage {
+          height: 10.25rem !important;
+          padding-left: 2.35rem;
+          padding-right: 0.35rem;
+          padding-top: 1.55rem;
+          padding-bottom: 2rem;
+          margin-bottom: 0.15rem;
+        }
+        #graph-stage .axis-label {
+          font-size: 0.62rem;
+        }
+        #y-axis-container {
+          width: 2rem;
+          top: 1.55rem;
+          bottom: 2rem;
+        }
+        #y-axis-container .y-tick-label {
+          font-size: 0.62rem;
+          margin-right: 0.15rem;
+        }
+        #bars-container {
+          left: 2.35rem;
+          right: 1.55rem;
+          top: 1.55rem;
+          bottom: 2rem;
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+          gap: 0.2rem;
+        }
+        .bar-wrapper {
+          max-width: 30px !important;
+        }
+        .bar-pct,
+        .bar-count {
+          font-size: 0.58rem;
+        }
+        .x-label {
+          font-size: 0.7rem;
+          bottom: -1.4rem;
+        }
+        #dice-stage {
+          margin-top: -1.3rem;
+          margin-bottom: 0.65rem;
+        }
+        .dice-container-wrapper {
+          gap: 12px;
+        }
+        .dice {
+          width: 44px;
+          height: 44px;
+          font-size: 7px;
+        }
+        .side {
+          width: 44px;
+          height: 44px;
+        }
+        .dot {
+          width: 9px;
+          height: 9px;
+          margin: -4.5px 0 0 -4.5px;
+        }
+        #rolling-phase,
+        #quiz-phase {
+          padding: 0.65rem;
+          border-radius: 0.75rem;
+          gap: 0.6rem;
+        }
+        #rolling-phase .rolling-text,
+        #quiz-phase .quiz-question {
+          font-size: 0.92rem;
+          line-height: 1.25;
+        }
+        #btn-roll-batch {
+          padding: 0.5rem 0.95rem;
+          font-size: 0.9rem;
+        }
+      }
     </style>
   </head>
-  <body class="min-h-screen flex items-center justify-center p-4">
-    <!-- Main Game Container (Clean White Card) -->
+  <body class="min-h-screen flex items-center justify-center p-5 lg:p-6">
+    <!-- WRAPPER: Closely spaced, perfectly centered layout -->
     <div
-      class="max-w-5xl w-full bg-white rounded-2xl shadow-xl overflow-hidden relative border border-slate-200"
+      id="content-wrapper"
+      class="w-full max-w-[1700px] flex justify-center items-center gap-2 lg:gap-3 relative z-10 pointer-events-none mx-auto"
     >
-      <!-- Header -->
+      <!-- LEFT SIDE: Spider-Man -->
       <div
-        class="bg-emerald-600 text-white p-4 flex justify-between items-center shadow-md z-10 relative"
+        id="spidey-container-left"
+        class="hidden xl:block w-[300px] shrink-0 relative pointer-events-none h-[680px]"
       >
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          Dice Graph Master
-        </h1>
+        <div
+          class="spidey-container center"
+          style="top: -62px; font-size: 15px"
+        >
+          <div class="rope center">
+            <div class="legs center">
+              <div class="boot-l"></div>
+              <div class="boot-r"></div>
+            </div>
+            <div class="costume center">
+              <div class="spider">
+                <div class="s1 center"></div>
+                <div class="s2 center"></div>
+                <div class="s3"></div>
+                <div class="s4"></div>
+              </div>
+              <div class="belt center"></div>
+              <div class="hand-r"></div>
+              <div class="hand-l"></div>
+              <div class="neck center"></div>
+              <div class="mask center">
+                <div class="eye-l">
+                  <div class="btn-lid"></div>
+                  <div class="btn-pupil"></div>
+                </div>
+                <div class="eye-r">
+                  <div class="btn-lid"></div>
+                  <div class="btn-pupil"></div>
+                </div>
+              </div>
+              <div class="cover center"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="p-6 relative">
-        <!-- Graph Container -->
-        <div class="h-80 w-full relative pl-12 pr-4 pt-8 pb-12 mb-4">
-          <!-- Axis Labels (Adjusted to avoid overlapping) -->
-          <div
-            class="absolute left-0 -top-2 text-slate-500 font-bold text-sm tracking-wide"
-          >
-            Rolls
-          </div>
-          <div
-            class="absolute -right-2 bottom-2 text-slate-500 font-bold text-sm tracking-wide"
-          >
-            Sum
-          </div>
-
-          <!-- Thick Axis Lines with Arrows -->
-          <!-- Y-Axis Line (Extends to top-6, giving arrow 24px clearance from the highest tick) -->
-          <div
-            class="absolute left-10 top-6 bottom-12 w-[3px] bg-slate-700 z-0 rounded-b-sm"
-          >
-            <div
-              class="absolute -top-[10px] -left-[4.5px] w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-slate-700 border-t-0"
-            ></div>
-          </div>
-          <!-- X-Axis Line (Extends to right-6, giving arrow clearance from the last bar) -->
-          <div
-            class="absolute left-10 right-6 bottom-12 h-[3px] bg-slate-700 z-0 rounded-l-sm"
-          >
-            <div
-              class="absolute -right-[10px] -top-[4.5px] w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[10px] border-l-slate-700 border-r-0"
-            ></div>
-          </div>
-
-          <!-- Dynamic Y-Axis Ticks Container -->
-          <div
-            id="y-axis-container"
-            class="absolute left-0 top-12 bottom-12 w-10 z-0"
-          >
-            <!-- Ticks injected here by JS -->
-          </div>
-
-          <!-- Bars & X-Axis Container -->
-          <div
-            id="bars-container"
-            class="absolute left-10 right-12 top-12 bottom-12 flex justify-between items-end gap-2 px-6 z-10"
-          >
-            <!-- Bars and X-ticks injected here by JS -->
-          </div>
-        </div>
-
-        <!-- Middle Dice Area (Slight negative margin anchors it between graph and controls) -->
-        <div class="flex justify-center -mt-10 mb-6 relative z-30">
-          <div
-            id="dice-overlay"
-            onclick="handleRoll(1)"
-            class="dice-container-wrapper drop-shadow-xl"
-            title="Click to roll 1x"
-          >
-            <div id="dice1" class="dice show-1">
-              <div class="side one"><div class="dot one-1"></div></div>
-              <div class="side two">
-                <div class="dot two-1"></div>
-                <div class="dot two-2"></div>
-              </div>
-              <div class="side three">
-                <div class="dot three-1"></div>
-                <div class="dot three-2"></div>
-                <div class="dot three-3"></div>
-              </div>
-              <div class="side four">
-                <div class="dot four-1"></div>
-                <div class="dot four-2"></div>
-                <div class="dot four-3"></div>
-                <div class="dot four-4"></div>
-              </div>
-              <div class="side five">
-                <div class="dot five-1"></div>
-                <div class="dot five-2"></div>
-                <div class="dot five-3"></div>
-                <div class="dot five-4"></div>
-                <div class="dot five-5"></div>
-              </div>
-              <div class="side six">
-                <div class="dot six-1"></div>
-                <div class="dot six-2"></div>
-                <div class="dot six-3"></div>
-                <div class="dot six-4"></div>
-                <div class="dot six-5"></div>
-                <div class="dot six-6"></div>
-              </div>
-            </div>
-            <div id="dice2" class="dice show-1">
-              <div class="side one"><div class="dot one-1"></div></div>
-              <div class="side two">
-                <div class="dot two-1"></div>
-                <div class="dot two-2"></div>
-              </div>
-              <div class="side three">
-                <div class="dot three-1"></div>
-                <div class="dot three-2"></div>
-                <div class="dot three-3"></div>
-              </div>
-              <div class="side four">
-                <div class="dot four-1"></div>
-                <div class="dot four-2"></div>
-                <div class="dot four-3"></div>
-                <div class="dot four-4"></div>
-              </div>
-              <div class="side five">
-                <div class="dot five-1"></div>
-                <div class="dot five-2"></div>
-                <div class="dot five-3"></div>
-                <div class="dot five-4"></div>
-                <div class="dot five-5"></div>
-              </div>
-              <div class="side six">
-                <div class="dot six-1"></div>
-                <div class="dot six-2"></div>
-                <div class="dot six-3"></div>
-                <div class="dot six-4"></div>
-                <div class="dot six-5"></div>
-                <div class="dot six-6"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PHASE 1: Controls -->
+      <!-- MAIN GAME CANVAS (Bigger, Dark Mode) -->
+      <div
+        id="main-layout"
+        class="w-full max-w-[970px] flex flex-col pointer-events-auto bg-slate-800 rounded-2xl shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] border-4 border-black overflow-hidden relative"
+      >
+        <!-- Header -->
         <div
-          id="rolling-phase"
-          class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm relative z-20"
+          id="game-header"
+          class="bg-red-600 text-white p-5 flex justify-between items-center z-10 relative border-b-4 border-black"
         >
-          <div class="text-xl md:text-2xl font-medium text-slate-600">
-            Roll the dice
-            <strong id="target-rolls-display" class="text-[#b12e8d]"
-              >100</strong
+          <h1
+            class="text-3xl font-black italic tracking-widest uppercase flex items-center gap-2"
+          >
+            Spidey's Graph Master
+          </h1>
+        </div>
+
+        <!-- Main Menu -->
+        <div
+          id="main-menu"
+          class="absolute inset-0 top-[76px] bg-slate-900/90 backdrop-blur-md flex items-center justify-center z-[70] p-6"
+        >
+          <div
+            class="menu-card w-full max-w-md bg-slate-800 rounded-2xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(227,40,50,1)] p-7 text-center transform transition-transform hover:-translate-y-1"
+          >
+            <p
+              class="text-blue-400 font-black tracking-widest uppercase text-sm mb-2"
             >
-            times. Remaining:
-            <strong id="remaining-rolls-display" class="text-[#b12e8d]"
-              >100</strong
+              MAIN MENU
+            </p>
+            <h2 class="menu-title text-4xl font-black text-white mb-2 italic">
+              Web-Shooter Data
+            </h2>
+            <p class="menu-subtitle text-slate-300 mb-5 font-medium">
+              Roll the dice, read the graph, and beat your best quiz score to
+              help Spider-Man analyze his web fluid!
+            </p>
+
+            <div
+              class="bg-slate-700 border-2 border-slate-600 rounded-xl py-4 mb-5"
             >
-          </div>
-          <div class="flex gap-3 h-12 items-center">
-            <!-- Hidden entirely at first! -->
+              <p
+                class="text-sm uppercase tracking-widest text-slate-300 font-bold"
+              >
+                Best Score
+              </p>
+              <p
+                id="menu-score"
+                class="menu-score-value text-4xl font-black text-blue-400 leading-tight"
+              >
+                0 / 3
+              </p>
+            </div>
+
             <button
-              id="btn-roll-batch"
-              class="hidden px-8 py-3 bg-[#f4d35e] hover:bg-[#e0c050] text-slate-800 font-extrabold rounded-lg shadow-md transition-all hover:-translate-y-1"
-            ></button>
+              onclick="startGameFromMenu()"
+              class="menu-play-btn w-full px-8 py-4 bg-[#f4d35e] hover:bg-[#eab308] text-slate-900 font-black text-xl rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-black transition-all active:translate-y-1 active:shadow-none uppercase tracking-wide"
+            >
+              THWIP & Play!
+            </button>
           </div>
         </div>
 
-        <!-- PHASE 2: Quiz -->
-        <div
-          id="quiz-phase"
-          class="hidden bg-emerald-50 p-6 rounded-xl border-2 border-emerald-200 shadow-md relative z-20"
-        >
+        <!-- Gameplay Area -->
+        <div id="game-content" class="p-6 lg:p-7 relative flex-grow">
+          <!-- Graph Container (Increased Height) -->
           <div
-            class="flex flex-col md:flex-row items-center justify-between gap-6"
+            id="graph-stage"
+            class="h-[22rem] lg:h-[23rem] w-full relative pl-14 pr-4 pt-8 pb-12 mb-5"
           >
             <div
-              class="flex-1 text-xl md:text-2xl font-medium text-slate-700 flex items-center gap-3"
+              class="axis-label absolute left-0 -top-2 text-slate-400 font-bold text-sm tracking-wide uppercase"
             >
-              <span
-                id="q-number"
-                class="bg-emerald-200 text-emerald-800 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0"
-                >1</span
-              >
-              <span id="q-text">Question text goes here?</span>
+              Rolls
+            </div>
+            <div
+              class="axis-label absolute -right-2 bottom-2 text-slate-400 font-bold text-sm tracking-wide uppercase"
+            >
+              Sum
             </div>
 
-            <!-- Input Mode -->
-            <div id="input-container" class="flex gap-2 items-center hidden">
-              <div class="relative">
-                <input
-                  type="number"
-                  id="q-input"
-                  placeholder="?"
-                  class="w-32 h-14 rounded-lg border-2 border-slate-300 bg-white text-center text-2xl font-bold transition-colors outline-none focus:border-emerald-500 text-slate-700"
-                />
-                <span
-                  id="q-suffix"
-                  class="absolute right-4 top-1/2 -translate-y-1/2 text-lg text-slate-400 font-bold"
-                ></span>
+            <!-- Lightened Axis Lines with Arrows for Dark Theme -->
+            <div
+              class="absolute left-10 top-6 bottom-12 w-[4px] bg-slate-400 z-0 rounded-b-sm"
+            >
+              <div
+                class="absolute -top-[12px] -left-[5px] w-0 h-0 border-l-[7px] border-l-transparent border-r-[7px] border-r-transparent border-b-[12px] border-b-slate-400 border-t-0"
+              ></div>
+            </div>
+            <div
+              class="absolute left-10 right-6 bottom-12 h-[4px] bg-slate-400 z-0 rounded-l-sm"
+            >
+              <div
+                class="absolute -right-[12px] -top-[5px] w-0 h-0 border-t-[7px] border-t-transparent border-b-[7px] border-b-transparent border-l-[12px] border-l-slate-400 border-r-0"
+              ></div>
+            </div>
+
+            <!-- Dynamic Y-Axis Ticks -->
+            <div
+              id="y-axis-container"
+              class="absolute left-0 top-12 bottom-12 w-10 z-0"
+            ></div>
+
+            <!-- Bars & X-Axis -->
+            <div
+              id="bars-container"
+              class="absolute left-10 right-12 top-12 bottom-12 flex justify-between items-end gap-3 px-6 z-10"
+            ></div>
+          </div>
+
+          <!-- Middle Dice Area -->
+          <div
+            id="dice-stage"
+            class="flex justify-center -mt-10 mb-6 relative z-30"
+          >
+            <div
+              id="dice-overlay"
+              onclick="handleRoll(1)"
+              class="dice-container-wrapper drop-shadow-2xl cursor-pointer"
+              title="Click to roll 1x"
+            >
+              <!-- Dice 1 -->
+              <div id="dice1" class="dice show-1">
+                <div class="side one"><div class="dot one-1"></div></div>
+                <div class="side two">
+                  <div class="dot two-1"></div>
+                  <div class="dot two-2"></div>
+                </div>
+                <div class="side three">
+                  <div class="dot three-1"></div>
+                  <div class="dot three-2"></div>
+                  <div class="dot three-3"></div>
+                </div>
+                <div class="side four">
+                  <div class="dot four-1"></div>
+                  <div class="dot four-2"></div>
+                  <div class="dot four-3"></div>
+                  <div class="dot four-4"></div>
+                </div>
+                <div class="side five">
+                  <div class="dot five-1"></div>
+                  <div class="dot five-2"></div>
+                  <div class="dot five-3"></div>
+                  <div class="dot five-4"></div>
+                  <div class="dot five-5"></div>
+                </div>
+                <div class="side six">
+                  <div class="dot six-1"></div>
+                  <div class="dot six-2"></div>
+                  <div class="dot six-3"></div>
+                  <div class="dot six-4"></div>
+                  <div class="dot six-5"></div>
+                  <div class="dot six-6"></div>
+                </div>
               </div>
-              <button
-                onclick="submitAnswer()"
-                class="h-14 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl rounded-lg shadow-sm transition-transform active:scale-95"
-              >
-                Check
-              </button>
+              <!-- Dice 2 -->
+              <div id="dice2" class="dice show-1">
+                <div class="side one"><div class="dot one-1"></div></div>
+                <div class="side two">
+                  <div class="dot two-1"></div>
+                  <div class="dot two-2"></div>
+                </div>
+                <div class="side three">
+                  <div class="dot three-1"></div>
+                  <div class="dot three-2"></div>
+                  <div class="dot three-3"></div>
+                </div>
+                <div class="side four">
+                  <div class="dot four-1"></div>
+                  <div class="dot four-2"></div>
+                  <div class="dot four-3"></div>
+                  <div class="dot four-4"></div>
+                </div>
+                <div class="side five">
+                  <div class="dot five-1"></div>
+                  <div class="dot five-2"></div>
+                  <div class="dot five-3"></div>
+                  <div class="dot five-4"></div>
+                  <div class="dot five-5"></div>
+                </div>
+                <div class="side six">
+                  <div class="dot six-1"></div>
+                  <div class="dot six-2"></div>
+                  <div class="dot six-3"></div>
+                  <div class="dot six-4"></div>
+                  <div class="dot six-5"></div>
+                  <div class="dot six-6"></div>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <!-- Choice Mode -->
-            <div id="choice-container" class="flex gap-4 hidden">
+          <!-- PHASE 1: Controls -->
+          <div
+            id="rolling-phase"
+            class="bg-slate-700 p-6 rounded-xl border-4 border-black flex flex-col md:flex-row items-center justify-between gap-4 relative z-20"
+          >
+            <div
+              class="rolling-text text-xl md:text-2xl font-medium text-slate-200"
+            >
+              Roll the dice
+              <strong id="target-rolls-display" class="text-red-400 font-black"
+                >100</strong
+              >
+              times. Remaining:
+              <strong
+                id="remaining-rolls-display"
+                class="text-blue-400 font-black"
+                >100</strong
+              >
+            </div>
+            <div class="flex gap-3 h-12 items-center">
               <button
-                id="btn-choice-1"
-                onclick="submitChoice(this.innerText)"
-                class="px-8 py-4 text-2xl font-bold bg-white hover:bg-emerald-50 hover:text-emerald-700 rounded-lg transition-colors border-2 border-slate-300 hover:border-emerald-500 shadow-sm"
-              ></button>
-              <button
-                id="btn-choice-2"
-                onclick="submitChoice(this.innerText)"
-                class="px-8 py-4 text-2xl font-bold bg-white hover:bg-emerald-50 hover:text-emerald-700 rounded-lg transition-colors border-2 border-slate-300 hover:border-emerald-500 shadow-sm"
+                id="btn-roll-batch"
+                class="hidden px-8 py-3 bg-[#f4d35e] hover:bg-[#eab308] text-black font-black uppercase tracking-wide border-2 border-black rounded-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:shadow-none"
               ></button>
             </div>
           </div>
+
+          <!-- PHASE 2: Quiz -->
+          <div
+            id="quiz-phase"
+            class="hidden bg-slate-700 p-6 rounded-xl border-4 border-black relative z-20"
+          >
+            <div
+              class="flex flex-col xl:flex-row items-center justify-between gap-6"
+            >
+              <div
+                class="quiz-question flex-1 text-xl lg:text-2xl font-bold text-white flex items-center gap-3"
+              >
+                <span
+                  id="q-number"
+                  class="bg-red-600 text-white border-2 border-black w-12 h-12 rounded-full flex items-center justify-center font-black text-xl shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  >1</span
+                >
+                <span id="q-text">Question text goes here?</span>
+              </div>
+
+              <!-- Input Mode -->
+              <div id="input-container" class="flex gap-2 items-center hidden">
+                <div class="relative">
+                  <input
+                    type="number"
+                    id="q-input"
+                    placeholder="?"
+                    class="w-32 h-14 rounded-lg border-4 border-black bg-slate-800 text-center text-2xl font-black text-white transition-colors outline-none focus:border-blue-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                  />
+                  <span
+                    id="q-suffix"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-lg text-slate-400 font-bold"
+                  ></span>
+                </div>
+                <button
+                  onclick="submitAnswer()"
+                  class="h-14 px-6 bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest text-lg rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-transform active:translate-y-1 active:shadow-none ml-2"
+                >
+                  Check
+                </button>
+              </div>
+
+              <!-- Choice Mode -->
+              <div id="choice-container" class="flex gap-4 hidden">
+                <button
+                  id="btn-choice-1"
+                  onclick="submitChoice(this.innerText)"
+                  class="px-8 py-4 text-2xl font-black bg-slate-800 text-white hover:bg-[#f4d35e] hover:text-black rounded-lg transition-colors border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
+                ></button>
+                <button
+                  id="btn-choice-2"
+                  onclick="submitChoice(this.innerText)"
+                  class="px-8 py-4 text-2xl font-black bg-slate-800 text-white hover:bg-[#f4d35e] hover:text-black rounded-lg transition-colors border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
+                ></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHASE 3: Outro -->
+        <div
+          id="outro-phase"
+          class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-center z-50 p-8 text-center"
+        >
+          <h2
+            class="text-5xl md:text-6xl font-black italic text-white mb-4 drop-shadow-lg tracking-widest uppercase"
+          >
+            Spectacular!
+          </h2>
+          <p class="text-2xl text-slate-300 mb-8 max-w-md font-medium">
+            You've completely mastered the web of probability!
+          </p>
+          <button
+            onclick="resetGame()"
+            class="px-10 py-5 bg-[#f4d35e] text-slate-900 font-black text-2xl uppercase tracking-widest rounded-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#eab308] active:translate-y-1 active:shadow-none transition-all"
+          >
+            Play Again
+          </button>
         </div>
       </div>
 
-      <!-- PHASE 3: Outro -->
+      <!-- RIGHT SIDE: Bigger Spider-Man (Pulled close using negative margin) -->
       <div
-        id="outro-phase"
-        class="hidden absolute inset-0 bg-emerald-600/95 backdrop-blur-md flex flex-col items-center justify-center z-50 p-6 text-center"
+        id="spidey-container-right"
+        class="hidden xl:block w-[300px] shrink-0 relative pointer-events-none h-[680px]"
       >
-        <h2
-          class="text-6xl font-extrabold text-white mb-4 drop-shadow-lg tracking-wide"
-        >
-          Excellent!
-        </h2>
-        <p class="text-2xl text-emerald-100 mb-8 max-w-md font-medium">
-          You've mastered bar graphs and probability!
-        </p>
-        <button
-          onclick="resetGame()"
-          class="px-10 py-5 bg-[#f4d35e] text-slate-800 font-extrabold text-2xl rounded-lg shadow-[0_6px_0_#d9b846] hover:bg-[#ffe373] active:translate-y-1 active:shadow-none transition-all flex items-center gap-3"
-        >
-          Play Again
-        </button>
+        <div class="spidey-container center" style="top: -62px; font-size: 15px">
+          <div class="rope center">
+            <div class="legs center">
+              <div class="boot-l"></div>
+              <div class="boot-r"></div>
+            </div>
+            <div class="costume center">
+              <div class="spider">
+                <div class="s1 center"></div>
+                <div class="s2 center"></div>
+                <div class="s3"></div>
+                <div class="s4"></div>
+              </div>
+              <div class="belt center"></div>
+              <div class="hand-r"></div>
+              <div class="hand-l"></div>
+              <div class="neck center"></div>
+              <!-- Enable pointer events specifically for the mask so squint/shake works -->
+              <div
+                class="mask center pointer-events-auto cursor-pointer"
+                title="Hover to squint, Click to agitate!"
+              >
+                <div class="eye-l">
+                  <div class="btn-lid"></div>
+                  <div class="btn-pupil"></div>
+                </div>
+                <div class="eye-r">
+                  <div class="btn-lid"></div>
+                  <div class="btn-pupil"></div>
+                </div>
+              </div>
+              <div class="cover center"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- JavaScript Logic -->
     <script>
-      // Constants & State
+      /* ============================================================
+         SPIDEY EYE TRACKING (Ultra-responsive JS logic)
+         ============================================================ */
+      const pupils = document.querySelectorAll(".btn-pupil");
+
+      document.addEventListener("mousemove", (e) => {
+        pupils.forEach((pupil) => {
+          // If hovering over the mask, CSS handles the centering
+          if (pupil.closest(".mask").matches(":hover")) {
+            pupil.style.transform = "";
+            return;
+          }
+
+          const eyeRect = pupil.parentElement.getBoundingClientRect();
+          const pupilRect = pupil.getBoundingClientRect();
+          const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+          const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+
+          const deltaX = e.clientX - eyeCenterX;
+          const deltaY = e.clientY - eyeCenterY;
+          const angle = Math.atan2(deltaY, deltaX);
+
+          // Keep pupil movement inside eye bounds at any scale.
+          const maxMoveX = Math.max(
+            0,
+            (eyeRect.width - pupilRect.width) / 2 - 1.5,
+          );
+          const maxMoveY = Math.max(
+            0,
+            (eyeRect.height - pupilRect.height) / 2 - 1.5,
+          );
+          const distance = Math.min(1, Math.hypot(deltaX, deltaY) / 260);
+          const rawX = Math.cos(angle) * maxMoveX * distance;
+          const rawY = Math.sin(angle) * maxMoveY * distance;
+          const moveX = Math.max(-maxMoveX, Math.min(maxMoveX, rawX));
+          const moveY = Math.max(-maxMoveY, Math.min(maxMoveY, rawY));
+
+          pupil.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+      });
+
+      /* ============================================================
+         GAME LOGIC
+         ============================================================ */
       let TARGET_ROLLS = 100;
       let totalRolls = 0;
-      let manualRollsCount = 0; // Tracks manual single clicks
-      let sessionBatchSize = 25; // Holds constant throughout a single game session
-      let rollsData = Array(11).fill(0); // Index 0 is sum 2, Index 10 is sum 12
+      let manualRollsCount = 0;
+      let sessionBatchSize = 25;
+      let rollsData = Array(11).fill(0);
       let isRolling = false;
+      let score = 0;
+      let bestScore = 0;
 
+      const SCORE_STORAGE_KEY = "diceGraphBestScore";
+      const TOTAL_QUIZ_QUESTIONS = 3;
       let questions = [];
       let currentQIndex = 0;
 
@@ -448,6 +1009,8 @@
       const elDiceOne = document.getElementById("dice1");
       const elDiceTwo = document.getElementById("dice2");
       const diceOverlay = document.getElementById("dice-overlay");
+      const mainMenu = document.getElementById("main-menu");
+      const menuScore = document.getElementById("menu-score");
       const barsContainer = document.getElementById("bars-container");
       const btnRollBatch = document.getElementById("btn-roll-batch");
       const targetDisplay = document.getElementById("target-rolls-display");
@@ -456,69 +1019,55 @@
       );
       const yAxisContainer = document.getElementById("y-axis-container");
 
-      // Initialize dynamic session values
       function initSession() {
-        TARGET_ROLLS = Math.floor(Math.random() * 101) + 100; // 100 to 200
-        sessionBatchSize = Math.floor(Math.random() * 16) + 20; // 20 to 35, locked per session
+        TARGET_ROLLS = Math.floor(Math.random() * 101) + 100;
+        sessionBatchSize = Math.floor(Math.random() * 16) + 20;
         targetDisplay.innerText = TARGET_ROLLS;
         updateBatchButton();
       }
 
-      // Update the dynamic batch roll button (text remains constant!)
       function updateBatchButton() {
         const remaining = TARGET_ROLLS - totalRolls;
         remainingDisplay.innerText = remaining;
-
         if (remaining <= 0) return;
-
-        // Text strictly stays constant for the entire session
-        btnRollBatch.innerText = `Roll ${sessionBatchSize} times`;
+        btnRollBatch.innerText = `Roll ${sessionBatchSize} Times`;
         btnRollBatch.onclick = () => handleRoll(sessionBatchSize);
       }
 
-      // Setup Graph Bars & X-Axis Ticks initially
       function initGraph() {
         barsContainer.innerHTML = "";
         for (let i = 2; i <= 12; i++) {
           const barWrapper = document.createElement("div");
           barWrapper.className =
-            "flex flex-col items-center justify-end h-full w-full max-w-[50px] relative group";
+            "bar-wrapper flex flex-col items-center justify-end h-full w-full max-w-[50px] relative group";
           barWrapper.innerHTML = `
-                    <div id="pct-${i}" class="mb-1 text-xs font-bold text-slate-700 opacity-0 transition-opacity whitespace-nowrap">0%</div>
-                    <div id="bar-${i}" class="w-full bg-emerald-400 group-hover:bg-emerald-300 flex flex-col justify-start items-center transition-all duration-500 rounded-t-sm" style="height: 0%;">
-                        <span id="count-${i}" class="text-white text-xs font-bold mt-1 drop-shadow-md hidden">0</span>
-                    </div>
-                    
-                    <!-- X-Axis Tick (Protrudes down through the axis) -->
-                    <div class="absolute -bottom-[4px] w-[3px] h-[8px] bg-slate-700 z-20"></div>
-                    
-                    <!-- X-Axis Label -->
-                    <div class="absolute -bottom-9 font-semibold text-slate-700 text-lg w-full text-center">${i}</div>
-                `;
+            <div id="pct-${i}" class="bar-pct mb-1 text-sm font-black text-blue-300 opacity-0 transition-opacity whitespace-nowrap">0%</div>
+            <div id="bar-${i}" class="w-full bg-blue-500 group-hover:bg-blue-400 border-t-4 border-l-4 border-r-4 border-black flex flex-col justify-start items-center transition-all duration-500 rounded-t-sm" style="height: 0%;">
+                <span id="count-${i}" class="bar-count text-white text-sm font-bold mt-2 drop-shadow-md hidden">0</span>
+            </div>
+            <div class="absolute -bottom-[4px] w-[4px] h-[8px] bg-slate-400 z-20"></div>
+            <div class="x-label absolute -bottom-9 font-black text-slate-300 text-xl w-full text-center">${i}</div>
+          `;
           barsContainer.appendChild(barWrapper);
         }
         updateGraph(true);
       }
 
-      // Logic to update UI Graph based on data
       function updateGraph(isInit = false) {
         const currentMax = Math.max(...rollsData);
-        // Dynamic max Y (multiples of 4 for nice ticks, minimum 4)
         const maxY = Math.max(4, Math.ceil(currentMax / 4) * 4);
 
-        // Generate Thick Y-Axis Ticks dynamically
         yAxisContainer.innerHTML = "";
         const step = maxY / 4;
         for (let i = 0; i <= 4; i++) {
           const val = i * step;
           const bottomPct = (i / 4) * 100;
           yAxisContainer.innerHTML += `
-                    <div class="absolute w-full flex items-center justify-end" style="bottom: ${bottomPct}%;">
-                        <span class="text-sm font-semibold text-slate-700 mr-1 transform translate-y-1/2">${val}</span>
-                        <!-- Y-Axis Tick (Protrudes left from the axis) -->
-                        <div class="w-2 h-[3px] bg-slate-700 transform translate-y-1/2 translate-x-[3px] z-20"></div>
-                    </div>
-                `;
+            <div class="absolute w-full flex items-center justify-end" style="bottom: ${bottomPct}%;">
+              <span class="y-tick-label text-sm font-black text-slate-300 mr-2 transform translate-y-1/2">${val}</span>
+              <div class="w-3 h-[4px] bg-slate-400 transform translate-y-1/2 translate-x-[4px] z-20"></div>
+            </div>
+          `;
         }
 
         rollsData.forEach((count, idx) => {
@@ -547,6 +1096,31 @@
         });
       }
 
+      function readBestScore() {
+        try {
+          const stored = localStorage.getItem(SCORE_STORAGE_KEY);
+          const parsed = Number.parseInt(stored || "0", 10);
+          return Number.isNaN(parsed) ? 0 : Math.max(0, parsed);
+        } catch {
+          return 0;
+        }
+      }
+
+      function persistBestScore(nextBestScore) {
+        try {
+          localStorage.setItem(SCORE_STORAGE_KEY, nextBestScore.toString());
+        } catch {}
+      }
+
+      function updateMenuScore() {
+        menuScore.innerText = `${bestScore} / ${TOTAL_QUIZ_QUESTIONS}`;
+      }
+
+      function startGameFromMenu() {
+        mainMenu.classList.add("hidden");
+        resetGame();
+      }
+
       function setDiceFace(diceEl, face) {
         for (let i = 1; i <= 6; i++) {
           diceEl.classList.remove("show-" + i);
@@ -560,12 +1134,10 @@
 
       function runDiceAnimation(finalD1, finalD2, config) {
         const { scrambleDuration, settleDuration, tickMs } = config;
-
         diceOverlay.classList.add("is-rolling");
         elDiceOne.classList.add("scrambling");
         elDiceTwo.classList.add("scrambling");
 
-        // Start with an immediate face change so the roll feels responsive.
         setDiceFace(elDiceOne, randomFace());
         setDiceFace(elDiceTwo, randomFace());
 
@@ -577,12 +1149,10 @@
 
           setTimeout(() => {
             clearInterval(scrambleTimer);
-
             elDiceOne.classList.remove("scrambling");
             elDiceTwo.classList.remove("scrambling");
             elDiceOne.classList.add("settling");
             elDiceTwo.classList.add("settling");
-
             setDiceFace(elDiceOne, finalD1);
             setDiceFace(elDiceTwo, finalD2);
 
@@ -596,12 +1166,10 @@
         });
       }
 
-      // Handle the roll button click
       async function handleRoll(times) {
         if (isRolling || totalRolls >= TARGET_ROLLS) return;
         isRolling = true;
 
-        // Tracking single rolls to unhide batch button
         if (times === 1) {
           manualRollsCount++;
           if (manualRollsCount >= 4) {
@@ -609,7 +1177,6 @@
           }
         }
 
-        // Math.min perfectly caps the rolls without changing the button text
         const actualTimes = Math.min(times, TARGET_ROLLS - totalRolls);
         if (actualTimes <= 0) {
           isRolling = false;
@@ -617,8 +1184,6 @@
         }
 
         let finalD1, finalD2;
-
-        // Compute math silently
         for (let i = 0; i < actualTimes; i++) {
           finalD1 = Math.floor(Math.random() * 6) + 1;
           finalD2 = Math.floor(Math.random() * 6) + 1;
@@ -642,10 +1207,8 @@
         }
       }
 
-      // Question Generation Logic
       function generateQuestionsArray() {
         const qs = [];
-        // 1. Mode
         let maxCount = -1;
         let modeSum = -1;
         rollsData.forEach((count, i) => {
@@ -661,7 +1224,6 @@
           suffix: "",
         });
 
-        // 2. Percentage
         const validIndices = rollsData
           .map((c, i) => (c > 0 ? i : -1))
           .filter((i) => i !== -1);
@@ -678,9 +1240,8 @@
           suffix: "%",
         });
 
-        // 3. Comparison
-        let sumA = Math.floor(Math.random() * 4) + 3; // 3-6
-        let sumB = Math.floor(Math.random() * 4) + 8; // 8-11
+        let sumA = Math.floor(Math.random() * 4) + 3;
+        let sumB = Math.floor(Math.random() * 4) + 8;
         let moreFreq = rollsData[sumA - 2] >= rollsData[sumB - 2] ? sumA : sumB;
         qs.push({
           type: "choice",
@@ -692,14 +1253,11 @@
         return qs;
       }
 
-      // Phase Transitions
       function startQuiz() {
         document.getElementById("rolling-phase").classList.add("hidden");
-
-        // Fade dice and shrink slightly during quiz
         document.getElementById("dice-overlay").style.transform = "scale(0.8)";
         document.getElementById("dice-overlay").style.opacity = "0.4";
-        document.getElementById("dice-overlay").style.pointerEvents = "none"; // Disable clicking
+        document.getElementById("dice-overlay").style.pointerEvents = "none";
 
         questions = generateQuestionsArray();
         currentQIndex = 0;
@@ -716,19 +1274,17 @@
         const choiceContainer = document.getElementById("choice-container");
         const qInput = document.getElementById("q-input");
 
-        // Reset visuals
         qInput.value = "";
         qInput.className =
-          "w-32 h-14 rounded-lg border-2 border-slate-300 bg-white text-center text-2xl font-bold outline-none focus:border-emerald-500 text-slate-700 transition-all";
+          "w-32 h-14 rounded-lg border-4 border-black bg-slate-800 text-center text-2xl font-black outline-none focus:border-blue-500 text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]";
 
-        // Highlight relevant bar if applicable
         for (let i = 2; i <= 12; i++) {
           const bar = document.getElementById(`bar-${i}`);
           if (q.text.includes(i.toString())) {
-            bar.style.backgroundColor = "#84cc16"; // lime-500
-            bar.style.boxShadow = "0 0 15px rgba(132, 204, 22, 0.8)";
+            bar.style.backgroundColor = "#f4d35e";
+            bar.style.boxShadow = "0 0 15px rgba(244, 211, 94, 0.8)";
           } else {
-            bar.style.backgroundColor = ""; // reset to class hover colors
+            bar.style.backgroundColor = "";
             bar.style.boxShadow = "none";
           }
         }
@@ -746,14 +1302,13 @@
         }
       }
 
-      // Check Answer Handlers
       function submitAnswer() {
-        const val = document.getElementById("q-input").value;
-        validateAndProceed(val, document.getElementById("q-input"));
+        validateAndProceed(
+          document.getElementById("q-input").value,
+          document.getElementById("q-input"),
+        );
       }
-
       function submitChoice(val) {
-        // Need a reference element for shaking, use the quiz phase container
         validateAndProceed(val, document.getElementById("quiz-phase"));
       }
 
@@ -763,13 +1318,16 @@
         const isCorrect = parseFloat(userVal) === parseFloat(q.answer);
 
         if (isCorrect) {
-          // Correct animation
+          if (!q.counted) {
+            score++;
+            q.counted = true;
+          }
           if (uiElementToShake.tagName === "INPUT") {
             uiElementToShake.classList.replace(
-              "border-slate-300",
-              "border-emerald-500",
+              "border-black",
+              "border-blue-500",
             );
-            uiElementToShake.classList.add("bg-emerald-50", "text-emerald-700");
+            uiElementToShake.classList.replace("bg-slate-800", "bg-blue-900");
           }
           setTimeout(() => {
             currentQIndex++;
@@ -780,13 +1338,12 @@
             }
           }, 1000);
         } else {
-          // Incorrect animation
           if (uiElementToShake.tagName === "INPUT") {
             uiElementToShake.classList.replace(
-              "border-slate-300",
+              "border-black",
               "border-red-500",
             );
-            uiElementToShake.classList.add("bg-red-50", "text-red-700");
+            uiElementToShake.classList.replace("bg-slate-800", "bg-red-900");
           }
           uiElementToShake.classList.add("shake");
           setTimeout(() => {
@@ -794,15 +1351,14 @@
             if (uiElementToShake.tagName === "INPUT") {
               uiElementToShake.classList.replace(
                 "border-red-500",
-                "border-slate-300",
+                "border-black",
               );
-              uiElementToShake.classList.remove("bg-red-50", "text-red-700");
+              uiElementToShake.classList.replace("bg-red-900", "bg-slate-800");
             }
           }, 400);
         }
       }
 
-      // Handle Enter key for input
       document
         .getElementById("q-input")
         .addEventListener("keypress", function (e) {
@@ -811,6 +1367,11 @@
 
       function showOutro() {
         document.getElementById("quiz-phase").classList.add("hidden");
+        if (score > bestScore) {
+          bestScore = score;
+          persistBestScore(bestScore);
+        }
+        updateMenuScore();
         document.getElementById("outro-phase").classList.remove("hidden");
       }
 
@@ -818,14 +1379,12 @@
         totalRolls = 0;
         manualRollsCount = 0;
         rollsData = Array(11).fill(0);
-
-        // Reset phases
+        score = 0;
         btnRollBatch.classList.add("hidden");
         document.getElementById("outro-phase").classList.add("hidden");
         document.getElementById("quiz-phase").classList.add("hidden");
         document.getElementById("rolling-phase").classList.remove("hidden");
 
-        // Reset Dice visuals
         diceOverlay.style.transform = "";
         diceOverlay.style.opacity = "1";
         diceOverlay.style.pointerEvents = "auto";
@@ -839,10 +1398,7 @@
         elDiceOne.classList.add("show-1");
         elDiceTwo.classList.add("show-1");
 
-        // Setup a new random target and batch
         initSession();
-
-        // Reset Graph
         for (let i = 2; i <= 12; i++) {
           const bar = document.getElementById(`bar-${i}`);
           if (bar) {
@@ -853,7 +1409,8 @@
         updateGraph();
       }
 
-      // Initialize
+      bestScore = readBestScore();
+      updateMenuScore();
       initSession();
       initGraph();
     </script>
